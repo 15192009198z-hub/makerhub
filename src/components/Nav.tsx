@@ -7,9 +7,8 @@ export default async function Nav() {
   const user = await getCurrentUser();
   const links = [
     { href: "/", label: "作品" },
-    { href: "/studio", label: "工作室" },
+    { href: "/studio", label: "造物" },
     { href: "/designs", label: "案例" },
-    { href: "/tools", label: "工具" },
     { href: "/market", label: "市场" },
   ];
   return (

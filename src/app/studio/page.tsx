@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import PartLinks from "@/components/PartLinks";
 import { buildPartLinks } from "@/lib/parts";
+import { TOOLS } from "@/lib/catalog";
 
 interface BomItem {
   name: string;
@@ -225,6 +226,44 @@ export default function StudioPage() {
           )}
         </div>
       )}
+
+      {/* 进阶工具 */}
+      <div className="mt-16">
+        <div className="flex items-end justify-between">
+          <div>
+            <div className="kicker">ADVANCED TOOLS</div>
+            <h2 className="mt-3 text-xl font-extrabold tracking-[2px]">
+              想用原版工具？进阶选项
+            </h2>
+          </div>
+        </div>
+        <p className="mt-3 max-w-[560px] text-[13px] leading-[1.8] text-[#6e6e78]">
+          工作室已覆盖大部分需求。这四个工具站功能更全（英文界面），
+          适合想深入学习、做专业项目的造物主。
+        </p>
+        <div className="mt-6 grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
+          {TOOLS.map((t) => (
+            <a
+              key={t.name}
+              href={t.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="card block p-5"
+            >
+              <div className="mono text-[10.5px] text-[#4a4a54]">{t.index}</div>
+              <h3 className="mt-2 text-[15px] font-semibold tracking-[1px]">
+                {t.name} <span className="ml-1 text-[12px] text-[#565660]">↗</span>
+              </h3>
+              <p className="mt-1.5 text-[12px] leading-[1.7] text-[#6e6e78]">
+                {t.desc}
+              </p>
+              <span className="mt-3 inline-block rounded border border-[rgba(76,141,255,0.25)] px-2 py-0.5 text-[10.5px] text-[#8fb6ff]">
+                {t.tag}
+              </span>
+            </a>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
