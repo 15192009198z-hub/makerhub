@@ -195,3 +195,93 @@ body {
 @keyframes blink {
   50% { opacity: 0; }
 }
+
+
+/* ===== 造物旅程（v12 完整版） ===== */
+  /* ========== 造物旅程（v6 炫酷版） ========== */
+  .journey { position: relative; padding: clamp(80px, 10vw, 140px) clamp(20px, 5vw, 56px) 100px; border-top: 1px solid rgba(255,255,255,0.05); overflow: hidden; }
+  #net { position: absolute; inset: 0; z-index: 0; opacity: .8; }
+  .j-inner { position: relative; z-index: 2; }
+  .j-head { text-align: center; margin-bottom: clamp(36px, 5vw, 64px); }
+  .j-head .kicker { font-size: 12px; color: #5E5E68; letter-spacing: 5px; }
+  .j-head h2 { font-size: clamp(28px, 4vw, 40px); font-weight: 800; letter-spacing: 3px; margin-top: 14px; }
+
+  .stage { display: grid; max-width: 780px; margin: 0 auto; }
+  .scene {
+    grid-area: 1 / 1; min-height: 330px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center;
+    opacity: 0; visibility: hidden; transform: translateY(16px) scale(.985); filter: blur(8px);
+    transition: opacity .5s ease, transform .5s ease, filter .5s ease, visibility .5s;
+  }
+  .scene.active { opacity: 1; visibility: visible; transform: none; filter: none; }
+
+  /* 场景1：梦想 —— 逐字浮现 */
+  .scene-idea .lead { font-size: 15px; color: #8E8E98; letter-spacing: 2px; opacity: 0; transform: translateY(8px); transition: all .6s .15s; }
+  .scene-idea.active .lead { opacity: 1; transform: none; }
+  .scene-idea .big { font-size: clamp(32px, 5vw, 50px); font-weight: 900; letter-spacing: 4px; margin-top: 24px; color: #F4F4F6; }
+  .scene-idea .big .ch { display: inline-block; opacity: 0; transform: translateY(24px) rotate(3deg); transition: all .5s cubic-bezier(.2,.7,.2,1); }
+  .scene-idea .big .cursor { display: inline-block; width: 3px; height: .85em; background: #4C8DFF; vertical-align: -0.1em; animation: blink .8s infinite; margin-left: 6px; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .scene-idea .trail { margin-top: 20px; font-size: 13.5px; color: #5E5E68; letter-spacing: 3px; opacity: 0; transition: opacity .6s 1.4s; }
+  .scene-idea.active .trail { opacity: 1; }
+  .scene-idea .halo { position: absolute; width: 420px; height: 420px; border-radius: 50%; background: radial-gradient(circle, rgba(76,141,255,0.10), transparent 65%); animation: haloPulse 3.2s ease-in-out infinite; pointer-events: none; }
+  @keyframes haloPulse { 0%,100% { transform: scale(.85); opacity: .5; } 50% { transform: scale(1.1); opacity: 1; } }
+
+  /* 场景2：设计 */
+  .scene-bom { gap: 10px; }
+  .scene-bom .cap { font-size: 14px; color: #8E8E98; letter-spacing: 2px; margin-bottom: 8px; }
+  .bom-line { position: relative; display: flex; align-items: center; gap: 18px; width: min(480px, 86vw); padding: 13px 20px; border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; background: rgba(255,255,255,0.02); opacity: 0; transform: translateX(-16px); transition: all .45s ease; font-size: 14px; overflow: hidden; }
+  .bom-line::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: #4C8DFF; transform: scaleY(0); transform-origin: top; transition: transform .4s .15s ease; }
+  .bom-line.show { opacity: 1; transform: none; }
+  .bom-line.show::before { transform: scaleY(1); }
+  .bom-line .n { color: #5E5E68; font-size: 11px; width: 26px; font-family: "SF Mono", Menlo, monospace; }
+  .bom-line .nm { flex: 1; letter-spacing: .5px; }
+  .bom-line .qt { color: #4C8DFF; font-family: "SF Mono", Menlo, monospace; font-size: 13px; }
+  .bom-line .st { color: #3E8D5F; font-size: 11px; border: 1px solid rgba(94,205,133,0.3); padding: 1px 7px; border-radius: 3px; }
+  .bom-line .ok { position: absolute; right: 14px; color: #3E8D5F; font-size: 13px; opacity: 0; transform: scale(.4); transition: all .3s .5s; }
+  .bom-line.show .ok { opacity: 1; transform: scale(1); }
+  .bom-done { margin-top: 14px; font-size: 12.5px; color: #3E8D5F; letter-spacing: 2px; opacity: 0; transform: translateY(8px); transition: all .5s; border: 1px solid rgba(94,205,133,0.25); padding: 6px 16px; border-radius: 999px; }
+  .bom-done.show { opacity: 1; transform: none; }
+
+  /* 场景3：买料 */
+  .scene-shop { gap: 0; }
+  .scene-shop .cap { font-size: 14px; color: #8E8E98; letter-spacing: 2px; margin-bottom: 24px; }
+  .shop-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+  .shop-btn { position: relative; padding: 12px 28px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.14); color: #C8C8CE; font-size: 14px; letter-spacing: 2px; opacity: 0; transform: translateY(14px) scale(.92); transition: all .4s cubic-bezier(.2,.8,.3,1.2); cursor: pointer; }
+  .shop-btn.show { opacity: 1; transform: none; }
+  .shop-btn.b1 { border-color: rgba(255,138,76,0.4); color: #FFA26E; }
+  .shop-btn.b2 { border-color: rgba(76,141,255,0.4); color: #7FA8FF; }
+  .shop-btn.b3 { border-color: rgba(240,120,120,0.4); color: #F58A8A; }
+  .arcs { width: min(560px, 88vw); height: 64px; margin: 4px auto 0; display: block; }
+  .arcs path { fill: none; stroke-width: 1.4; stroke-dasharray: 200; stroke-dashoffset: 200; transition: stroke-dashoffset .7s ease; }
+  .scene-shop.show-arcs .arcs path { stroke-dashoffset: 0; }
+  .scene-shop .cost { margin-top: 6px; font-size: 14px; color: #5E5E68; letter-spacing: 2px; opacity: 0; transform: translateY(8px); transition: all .5s .6s; }
+  .scene-shop.show-arcs .cost { opacity: 1; transform: none; }
+  .scene-shop .cost b { color: #C8C8CE; font-family: "SF Mono", Menlo, monospace; font-weight: 600; font-size: 16px; }
+
+  /* 场景4：交易 */
+  .scene-trade { gap: 22px; }
+  .scene-trade .cap { font-size: 14px; color: #8E8E98; letter-spacing: 2px; }
+  .chain { display: flex; align-items: center; gap: 14px; }
+  .chain .node { position: relative; padding: 10px 18px; border: 1px solid rgba(255,255,255,0.14); border-radius: 7px; font-size: 13px; color: #C8C8CE; letter-spacing: 1px; opacity: 0; transform: translateY(10px) scale(.95); transition: all .4s ease; }
+  .chain .node.show { opacity: 1; transform: none; }
+  .chain .node.lit { border-color: rgba(76,141,255,0.6); color: #7FA8FF; box-shadow: 0 0 22px rgba(76,141,255,0.3); }
+  .chain .node.lit::after { content: ''; position: absolute; inset: -4px; border-radius: 10px; border: 1px solid rgba(76,141,255,0.4); animation: ringOut 1.2s ease-out infinite; }
+  @keyframes ringOut { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.25); } }
+  .chain .link { color: #3A3A44; font-size: 14px; opacity: 0; transition: opacity .3s .3s; }
+  .chain.show-links .link { opacity: 1; color: #4C8DFF; text-shadow: 0 0 8px rgba(76,141,255,0.6); }
+  .scene-trade .done { font-size: 15px; letter-spacing: 2px; color: #C8C8CE; opacity: 0; transition: opacity .5s .5s; }
+  .scene-trade.show-done .done { opacity: 1; }
+  .scene-trade .done b { color: #4C8DFF; font-family: "SF Mono", Menlo, monospace; font-weight: 600; }
+
+  /* 步骤条 + 进度连线 */
+  .steps { display: flex; gap: clamp(18px, 4vw, 44px); justify-content: center; margin-top: clamp(40px, 5vw, 60px); position: relative; }
+  .steps::before { content: ''; position: absolute; top: 3px; left: 8%; right: 8%; height: 1px; background: rgba(255,255,255,0.06); }
+  .steps .track { position: absolute; top: 3px; left: 8%; height: 1px; width: 0%; background: linear-gradient(90deg, #4C8DFF, rgba(76,141,255,0.3)); transition: width .8s ease; }
+  .steps .sp { position: relative; display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: #4A4A54; letter-spacing: 2px; transition: color .3s; }
+  .steps .sp .sd { width: 7px; height: 7px; border-radius: 50%; background: #33333C; transition: all .3s; z-index: 1; }
+  .steps .sp.on { color: #C8C8CE; }
+  .steps .sp.on .sd { background: #4C8DFF; box-shadow: 0 0 10px rgba(76,141,255,0.9); }
+
+

@@ -13,7 +13,7 @@ export default async function Nav() {
   ];
   return (
     <header className="sticky top-0 z-50 border-b border-[rgba(255,255,255,0.05)] bg-[rgba(10,10,12,0.7)] backdrop-blur-md">
-      <div className="mx-auto flex h-[72px] max-w-6xl items-center px-6 lg:px-14">
+      <div className="mx-auto flex h-[72px] max-w-[1440px] items-center px-6 lg:px-10">
         <Link href="/" className="flex items-center gap-3">
           <Logo />
           <span>
@@ -25,7 +25,7 @@ export default async function Nav() {
             </span>
           </span>
         </Link>
-        <nav className="ml-10 flex gap-8 lg:ml-16">
+        <nav className="ml-10 flex gap-8 lg:ml-16 lg:gap-10">
           {links.map((l) => (
             <Link
               key={l.href}
