@@ -26,9 +26,10 @@ export function parseBomText(text: string): BomItem[] {
     }
 
     // 提取数量：×2 / x2 / X2 / *2 / 2个 / 2只 / 2pcs / 数量:2
+    // 锚定行尾，避免把规格型号里的 x（如 M3x10）误判成数量
     let qty = "1";
     const qMatch = rest.match(
-      /[×xX*]\s*(\d+)|(\d+)\s*(?:个|只|件|片|颗|pcs|PCS|个装)$|数量\D*(\d+)/
+      /[×xX*]\s*(\d+)\s*$|(\d+)\s*(?:个|只|件|片|颗|pcs|PCS|个装)\s*$|数量\D*(\d+)\s*$/
     );
     if (qMatch) {
       qty = qMatch[1] || qMatch[2] || qMatch[3] || "1";
