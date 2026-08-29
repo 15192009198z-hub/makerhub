@@ -36,11 +36,11 @@ export default async function Home() {
             从想法到实物，只差一次生成。发现工具、挑一个设计清单，作品回到这里展示、找料、交易。
           </p>
           <div className="mt-11 flex gap-3.5">
-            <Link href="/designs" className="btn btn-primary !px-8 !py-3.5 !text-[15px]">
+            <Link href="/studio" className="btn btn-primary !px-8 !py-3.5 !text-[15px]">
               去生成我的第一个实物
             </Link>
             <Link href="/designs" className="btn btn-outline !px-8 !py-3.5 !text-[15px]">
-              浏览设计清单
+              看看真实案例
             </Link>
           </div>
         </div>
@@ -64,9 +64,9 @@ export default async function Home() {
               {
                 n: "01",
                 t: "去生成",
-                d: "打开 Blueprint / Cirkit / Schematik，用一句话描述你的想法，AI 生成设计 + 零件清单。",
-                cta: "去工具站",
-                href: "/tools",
+                d: "打开 AI 造物工作室，用一句话描述你的想法，AI 生成零件清单 + 接线 + 组装步骤。",
+                cta: "打开工作室",
+                href: "/studio",
               },
               {
                 n: "02",
