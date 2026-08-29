@@ -27,7 +27,19 @@ const SYSTEM_PROMPT = `你是资深硬件创客助手。用户会用中文描述
 要求：
 - 零件优先选国内容易买到的常见模块（Arduino/ESP32、传感器模块、面包板、杜邦线等）
 - bom 至少 3 个零件，最多 8 个
-- connections 列出关键电气连接 4-8 条，a/b 用 bom 中的零件名称，note 说明引脚或信号
+- connections 列出关键电气连接 4-8 条，a/b 用 bom 中的零件名称，note 写真实引脚或信号（如 A0、D9→Trig、VCC/GND）
+- 常用模块引脚速查（note 里用真实引脚）：
+  Arduino Nano: D2-D13 数字, A0-A7 模拟, 5V/3.3V/GND/VIN
+  ESP32: GPIO 0-39, 3V3/GND/VIN(5V)
+  KY-037/KY-038 声音传感器: VCC GND DO AO
+  HC-SR04 超声波: VCC Trig Echo GND
+  DHT11: VCC DATA GND
+  WS2812B 灯带: 5V DIN GND
+  SG90 舵机: 红VCC 棕GND 橙信号(D9)
+  L298N 驱动: IN1-IN4, ENA ENB, OUT1-4, 12V GND 5V
+  继电器模块: VCC GND IN
+  土壤湿度模块: VCC GND DO(A0)
+  有源蜂鸣器: VCC 信号 GND
 - 步骤 3-5 条，具体可执行
 - 全部用简体中文`;
 
