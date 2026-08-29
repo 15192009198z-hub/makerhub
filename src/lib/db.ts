@@ -505,3 +505,67 @@ export async function listProjectsByUser(userId: number): Promise<ProjectRow[]> 
     mapProject(r as unknown as Record<string, unknown>)
   );
 }
+
+// ---- 管理后台 ----
+
+export interface AdminRecentRow {
+  kind: string;
+  id: number;
+  title: string;
+  author: string;
+  created_at: string;
+  extra: number;
+}
+
+export async function getAdminStats(): Promise<{
+  users: number;
+  projects: number;
+  products: number;
+  orders: number;
+  recent: AdminRecentRow[];
+}> {
+  await initDb();
+  const [users, projects, products, orders] = await Promise.all([
+    db.execute("SELECT COUNT(*) AS c FROM users"),
+    db.execute("SELECT COUNT(*) AS c FROM projects"),
+    db.execute("SELECT COUNT(*) AS c FROM products"),
+    db.execute("SELECT COUNT(*) AS c FROM orders"),
+  ]);
+  const [projRows, prodRows, orderRows] = await Promise.all([
+    db.execute(
+      `SELECT p.id, p.title, u.name AS author, p.created_at, p.likes AS extra
+       FROM projects p JOIN users u ON p.user_id = u.id ORDER BY p.created_at DESC LIMIT 10`
+    ),
+    db.execute(
+      `SELECT p.id, p.title, u.name AS author, p.created_at, p.price AS extra
+       FROM products p JOIN users u ON p.user_id = u.id ORDER BY p.created_at DESC LIMIT 10`
+    ),
+    db.execute(
+      `SELECT o.id, pr.title, u.name AS author, o.created_at, 0 AS extra
+       FROM orders o JOIN products pr ON o.product_id = pr.id
+       JOIN users u ON o.buyer_id = u.id ORDER BY o.created_at DESC LIMIT 10`
+    ),
+  ]);
+  const toRow = (kind: string) => (r: Record<string, unknown>): AdminRecentRow => ({
+    kind,
+    id: Number(r.id),
+    title: String(r.title),
+    author: String(r.author),
+    created_at: String(r.created_at),
+    extra: Number(r.extra || 0),
+  });
+  const recent = [
+    ...projRows.rows.map(toRow("project")),
+    ...prodRows.rows.map(toRow("product")),
+    ...orderRows.rows.map(toRow("order")),
+  ]
+    .sort((a, b) => (a.created_at < b.created_at ? 1 : -1))
+    .slice(0, 30);
+  return {
+    users: Number(users.rows[0].c),
+    projects: Number(projects.rows[0].c),
+    products: Number(products.rows[0].c),
+    orders: Number(orders.rows[0].c),
+    recent,
+  };
+}

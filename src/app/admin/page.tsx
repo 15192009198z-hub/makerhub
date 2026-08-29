@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { isAdmin } from "@/lib/admin";
+import { getAdminStats } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
@@ -15,32 +16,12 @@ export default async function AdminPage() {
   const user = await getCurrentUser();
   if (!isAdmin(user)) redirect("/");
 
-  // 直接服务端查统计（管理员）
-  const { db, initDb } = await import("@/lib/db");
-  await initDb();
-  const [users, projects, products, orders] = await Promise.all([
-    db.execute("SELECT COUNT(*) AS c FROM users"),
-    db.execute("SELECT COUNT(*) AS c FROM projects"),
-    db.execute("SELECT COUNT(*) AS c FROM products"),
-    db.execute("SELECT COUNT(*) AS c FROM orders"),
-  ]);
-  const recent = await db.execute(`
-    SELECT 'project' AS kind, p.id, p.title, u.name AS author, p.created_at, p.likes AS extra
-    FROM projects p JOIN users u ON p.user_id = u.id
-    UNION ALL
-    SELECT 'product' AS kind, p.id, p.title, u.name AS author, p.created_at, p.price AS extra
-    FROM products p JOIN users u ON p.user_id = u.id
-    UNION ALL
-    SELECT 'order' AS kind, o.id, pr.title, u.name AS author, o.created_at, 0 AS extra
-    FROM orders o JOIN products pr ON o.product_id = pr.id JOIN users u ON o.buyer_id = u.id
-    ORDER BY created_at DESC LIMIT 30
-  `);
-
+  const data = await getAdminStats();
   const stats = [
-    ["用户", Number(users.rows[0].c)],
-    ["作品", Number(projects.rows[0].c)],
-    ["商品", Number(products.rows[0].c)],
-    ["意向单", Number(orders.rows[0].c)],
+    ["用户", data.users],
+    ["作品", data.projects],
+    ["商品", data.products],
+    ["意向单", data.orders],
   ];
 
   return (
@@ -73,16 +54,16 @@ export default async function AdminPage() {
             </tr>
           </thead>
           <tbody>
-            {recent.rows.map((r, i) => (
+            {data.recent.map((r, i) => (
               <tr key={i} className="border-b border-[rgba(255,255,255,0.05)] last:border-0">
                 <td className="px-4 py-3">
                   <span className="rounded border border-[rgba(76,141,255,0.3)] px-1.5 py-0.5 text-[10.5px] text-[#8fb6ff]">
-                    {KIND_LABEL[String(r.kind)] || String(r.kind)}
+                    {KIND_LABEL[r.kind] || r.kind}
                   </span>
                 </td>
-                <td className="max-w-[280px] truncate px-4 py-3 text-[#e8e8ea]">{String(r.title)}</td>
-                <td className="px-4 py-3 text-[#8e8e98]">{String(r.author)}</td>
-                <td className="px-4 py-3 text-xs text-[#5e5e68]">{String(r.created_at)}</td>
+                <td className="max-w-[280px] truncate px-4 py-3 text-[#e8e8ea]">{r.title}</td>
+                <td className="px-4 py-3 text-[#8e8e98]">{r.author}</td>
+                <td className="px-4 py-3 text-xs text-[#5e5e68]">{r.created_at}</td>
                 <td className="px-4 py-3">
                   <Link
                     href={
@@ -99,7 +80,7 @@ export default async function AdminPage() {
                 </td>
               </tr>
             ))}
-            {recent.rows.length === 0 && (
+            {data.recent.length === 0 && (
               <tr>
                 <td colSpan={5} className="px-4 py-8 text-center text-[#5e5e68]">
                   暂无动态
