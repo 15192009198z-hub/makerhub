@@ -4,7 +4,7 @@ import HeroParticles from "@/components/HeroParticles";
 import CubeTower from "@/components/CubeTower";
 import Journey from "@/components/Journey";
 import { listProjects } from "@/lib/db";
-import { TOOLS, DESIGNS } from "@/lib/catalog";
+import { TOOLS, REAL_PROJECTS } from "@/lib/catalog";
 
 export const dynamic = "force-dynamic";
 
@@ -50,6 +50,60 @@ export default async function Home() {
       {/* ===== 造物旅程 ===== */}
       <Journey />
 
+      {/* ===== 如何使用 ===== */}
+      <section className="border-t border-[rgba(255,255,255,0.05)]">
+        <div className="mx-auto max-w-[1120px] px-6 py-24 lg:px-12">
+          <div className="text-center">
+            <div className="kicker">HOW IT WORKS</div>
+            <h2 className="mt-3 text-3xl font-extrabold tracking-[2px] lg:text-4xl">
+              三步，从想法到实物
+            </h2>
+          </div>
+          <div className="mt-14 grid grid-cols-1 gap-4 md:grid-cols-3">
+            {[
+              {
+                n: "01",
+                t: "去生成",
+                d: "打开 Blueprint / Cirkit / Schematik，用一句话描述你的想法，AI 生成设计 + 零件清单。",
+                cta: "去工具站",
+                href: "/tools",
+              },
+              {
+                n: "02",
+                t: "来发布",
+                d: "回到 MakerHub 发布作品，粘贴零件清单（BOM），自动生成淘宝 / 1688 / 拼多多找料链接。",
+                cta: "发布作品",
+                href: "/submit",
+              },
+              {
+                n: "03",
+                t: "做出它",
+                d: "按链接买料（平均几十块），照着组装说明做出来，晒实物、挂交易意向，闲鱼成交。",
+                cta: "逛逛市场",
+                href: "/market",
+              },
+            ].map((g) => (
+              <div
+                key={g.n}
+                className="card flex flex-col p-7"
+              >
+                <div className="mono text-[13px] text-[#4c8dff]">{g.n}</div>
+                <h3 className="mt-4 text-lg font-bold tracking-[2px]">{g.t}</h3>
+                <p className="mt-3 flex-1 text-[13px] leading-[1.9] text-[#77777f]">
+                  {g.d}
+                </p>
+                <Link
+                  href={g.href}
+                  className="mt-6 inline-block text-[13px] tracking-[1px] text-[#7fa8ff] transition-colors hover:text-[#4c8dff]"
+                >
+                  {g.cta} →
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ===== 工具集合 ===== */}
       <section className="mx-auto max-w-[1120px] px-6 py-24 lg:px-12">
         <div className="mb-10">
@@ -82,50 +136,42 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* ===== 设计清单 ===== */}
+      {/* ===== 真实案例 ===== */}
       <section className="mx-auto max-w-[1120px] px-6 pb-24 lg:px-12">
         <div className="mb-10 flex items-end justify-between">
           <div>
-            <div className="kicker">DESIGNS</div>
+            <div className="kicker">REAL PROJECTS</div>
             <h2 className="mt-3 text-3xl font-extrabold tracking-[2px] lg:text-4xl">
-              可以试的 AI 设计清单
+              真实造物案例
             </h2>
           </div>
           <Link href="/designs" className="text-[13px] text-[#5e5e68] hover:text-[#4c8dff]">
-            全部清单 →
+            全部案例 →
           </Link>
         </div>
         <div className="grid grid-cols-1 gap-3.5 md:grid-cols-3">
-          {DESIGNS.map((d) => (
-            <Link key={d.id} href={`/designs/${d.id}`} className="card overflow-hidden">
-              <div className="flex h-[108px] items-center justify-center border-b border-[rgba(255,255,255,0.06)] text-[26px] text-[#565660]">
-                {d.icon}
+          {REAL_PROJECTS.map((d) => (
+            <Link key={d.id} href={`/designs/${d.id}`} className="card flex flex-col overflow-hidden">
+              <div className="flex h-[96px] items-center justify-center border-b border-[rgba(255,255,255,0.06)]">
+                <span className="mono text-[11px] tracking-[4px] text-[#565660]">
+                  {d.source}
+                </span>
               </div>
-              <div className="p-5">
+              <div className="flex flex-1 flex-col p-5">
                 <div className="flex items-center justify-between text-[15px] font-semibold">
                   {d.title}
                   <span className="text-[13px] text-[#565660] transition-all hover:text-[#4c8dff]">
                     →
                   </span>
                 </div>
-                <p className="mt-2 text-[12.5px] leading-[1.6] text-[#77777f]">
+                <p className="mt-2 line-clamp-2 text-[12.5px] leading-[1.7] text-[#77777f]">
                   {d.desc}
                 </p>
-                <div className="mt-4 flex gap-3 text-[11.5px] text-[#9a9aa3]">
-                  <span>
-                    难度
-                    <em
-                      className={`mono ml-1 rounded border px-1.5 py-0.5 not-italic ${DIFF_STYLE[d.difficulty]}`}
-                    >
-                      {d.difficulty}
-                    </em>
+                <div className="mt-auto flex items-center justify-between pt-4 text-[11.5px] text-[#5e5e68]">
+                  <span className="mono rounded border border-[rgba(76,141,255,0.25)] px-2 py-0.5 text-[11px] not-italic text-[#8fb6ff]">
+                    {d.difficulty}
                   </span>
-                  <span>
-                    成本<em className="mono ml-1 not-italic text-[#c9c9cf]">¥{d.cost}</em>
-                  </span>
-                  <span>
-                    时长<em className="mono ml-1 not-italic text-[#c9c9cf]">{d.duration}</em>
-                  </span>
+                  <span>👤 {d.author}</span>
                 </div>
               </div>
             </Link>
