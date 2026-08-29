@@ -1,12 +1,19 @@
 import type { Metadata } from "next";
+import { Noto_Serif_SC } from "next/font/google";
 import "./globals.css";
 import Nav from "@/components/Nav";
-import { getCurrentUser } from "@/lib/auth";
+
+const serifCn = Noto_Serif_SC({
+  subsets: ["latin"],
+  weight: ["600", "700", "900"],
+  variable: "--font-serif-cn",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
-  title: "MakerHub · 实物版 GitHub",
+  title: "MakerHub · 造物主社区",
   description:
-    "用 AI 做实物硬件，在这里晒作品、分享零件清单、一键找到国内购买渠道。实物版的 GitHub。",
+    "实物 VibeCoding 集合社区——用 AI 造物，晒出来，买得到。发现工具、挑设计清单、生成实物、找料交易。",
 };
 
 export default function RootLayout({
@@ -15,12 +22,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="zh-CN" className="h-full antialiased">
-      <body className="min-h-full flex flex-col bg-[#0a0f14] text-slate-200">
+    <html lang="zh-CN" className={`${serifCn.variable} h-full antialiased`}>
+      <body className="min-h-full flex flex-col">
         <Nav />
         <main className="flex-1">{children}</main>
-        <footer className="border-t border-[#1e2a36] py-6 text-center text-xs text-slate-500">
-          MakerHub · 实物版 GitHub —— AI 做硬件，晒出来，买得到
+        <footer className="border-t border-[rgba(255,255,255,0.05)] py-10 text-center text-xs tracking-[2px] text-[#4a4a54]">
+          MakerHub · 造物主社区 —— AI 造物 · 晒出来 · 买得到
         </footer>
       </body>
     </html>

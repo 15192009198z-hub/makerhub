@@ -1,20 +1,93 @@
 @import "tailwindcss";
 
+:root {
+  --bg: #0a0a0c;
+  --panel: #0f0f12;
+  --line: rgba(255, 255, 255, 0.08);
+  --txt: #e8e8ea;
+  --txt-dim: #8e8e98;
+  --txt-faint: #5e5e68;
+  --accent: #4c8dff;
+}
+
 html {
-  scrollbar-color: #1e2a36 #0a0f14;
+  scrollbar-color: #2a2a32 #0a0a0c;
 }
 
 body {
+  background: var(--bg);
+  color: var(--txt);
   font-family:
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    "PingFang SC",
-    "Hiragino Sans GB",
-    "Microsoft YaHei",
-    sans-serif;
+    -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-serif-cn {
+  font-family: var(--font-serif-cn), "Songti SC", "Noto Serif SC", "STSong",
+    serif;
+}
+
+.mono {
+  font-family: "SF Mono", Menlo, Consolas, monospace;
 }
 
 ::selection {
-  background: rgba(34, 211, 238, 0.3);
+  background: rgba(76, 141, 255, 0.35);
+}
+
+/* 通用组件 */
+.card {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.card:hover {
+  border-color: rgba(76, 141, 255, 0.45);
+  transform: translateY(-3px);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+.btn-primary {
+  background: #f2f2f4;
+  color: #0a0a0c;
+}
+.btn-primary:hover {
+  background: #ffffff;
+  transform: translateY(-1px);
+}
+.btn-outline {
+  border-color: rgba(255, 255, 255, 0.16);
+  color: #d0d0d6;
+}
+.btn-outline:hover {
+  border-color: rgba(76, 141, 255, 0.6);
+  color: #fff;
+}
+.btn-blue {
+  background: var(--accent);
+  color: #fff;
+}
+.btn-blue:hover {
+  background: #639cff;
+}
+
+.kicker {
+  font-size: 12px;
+  color: var(--txt-faint);
+  letter-spacing: 5px;
 }

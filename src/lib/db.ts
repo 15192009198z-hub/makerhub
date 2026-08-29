@@ -4,6 +4,33 @@
 import { createClient } from "@libsql/client";
 import type { BomItem, Comment, DealTag, Project, User } from "./types";
 
+export interface ProductRow {
+  id: number;
+  user_id: number;
+  title: string;
+  desc: string;
+  price: number;
+  type: string; // 实物 | 设计 | 教程
+  image_url: string;
+  project_id: number | null;
+  status: string; // 在售 | 下架
+  created_at: string;
+  author_name: string;
+}
+
+export interface OrderRow {
+  id: number;
+  product_id: number;
+  buyer_id: number;
+  contact: string;
+  message: string;
+  status: string; // 待联系 | 已联系 | 已完成
+  created_at: string;
+  product_title: string;
+  seller_id: number;
+  buyer_name: string;
+}
+
 export const db = createClient({
   url: process.env.TURSO_DATABASE_URL || "file:./makerhub.db",
   authToken: process.env.TURSO_AUTH_TOKEN || undefined,
@@ -56,6 +83,34 @@ export async function initDb(): Promise<void> {
       content TEXT NOT NULL,
       created_at TEXT DEFAULT (datetime('now')),
       FOREIGN KEY (project_id) REFERENCES projects(id)
+    )
+  `);
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS products (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      title TEXT NOT NULL,
+      desc TEXT NOT NULL,
+      price INTEGER NOT NULL DEFAULT 0,
+      type TEXT DEFAULT '实物',
+      image_url TEXT DEFAULT '',
+      project_id INTEGER,
+      status TEXT DEFAULT '在售',
+      created_at TEXT DEFAULT (datetime('now')),
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    )
+  `);
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS orders (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      product_id INTEGER NOT NULL,
+      buyer_id INTEGER NOT NULL,
+      contact TEXT NOT NULL,
+      message TEXT DEFAULT '',
+      status TEXT DEFAULT '待联系',
+      created_at TEXT DEFAULT (datetime('now')),
+      FOREIGN KEY (product_id) REFERENCES products(id),
+      FOREIGN KEY (buyer_id) REFERENCES users(id)
     )
   `);
   initialized = true;
@@ -240,4 +295,213 @@ export async function addComment(
     sql: "INSERT INTO comments (project_id, user_id, content) VALUES (?, ?, ?)",
     args: [projectId, userId, content.trim().slice(0, 1000)],
   });
+}
+
+// ---- 商品 ----
+
+function mapProduct(r: Record<string, unknown>): ProductRow {
+  return {
+    id: Number(r.id),
+    user_id: Number(r.user_id),
+    title: r.title as string,
+    desc: r.desc as string,
+    price: Number(r.price || 0),
+    type: (r.type as string) || "实物",
+    image_url: (r.image_url as string) || "",
+    project_id: r.project_id ? Number(r.project_id) : null,
+    status: (r.status as string) || "在售",
+    created_at: (r.created_at as string) || "",
+    author_name: (r.author_name as string) || "匿名",
+  };
+}
+
+export async function listProducts(status = "在售"): Promise<ProductRow[]> {
+  await initDb();
+  const res = await db.execute({
+    sql: `SELECT p.*, u.name AS author_name FROM products p
+          JOIN users u ON p.user_id = u.id
+          WHERE p.status = ? ORDER BY p.created_at DESC`,
+    args: [status],
+  });
+  return res.rows.map((r) =>
+    mapProduct(r as unknown as Record<string, unknown>)
+  );
+}
+
+export async function getProduct(id: number): Promise<ProductRow | null> {
+  await initDb();
+  const res = await db.execute({
+    sql: `SELECT p.*, u.name AS author_name FROM products p
+          JOIN users u ON p.user_id = u.id WHERE p.id = ?`,
+    args: [id],
+  });
+  if (res.rows.length === 0) return null;
+  return mapProduct(res.rows[0] as unknown as Record<string, unknown>);
+}
+
+export async function createProduct(input: {
+  userId: number;
+  title: string;
+  desc: string;
+  price: number;
+  type: string;
+  imageUrl: string;
+  projectId: number | null;
+}): Promise<number> {
+  await initDb();
+  const res = await db.execute({
+    sql: `INSERT INTO products (user_id, title, desc, price, type, image_url, project_id)
+          VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id`,
+    args: [
+      input.userId,
+      input.title.trim().slice(0, 80),
+      input.desc.trim().slice(0, 2000),
+      Math.max(0, Math.round(input.price)),
+      input.type,
+      input.imageUrl.trim().slice(0, 1000),
+      input.projectId,
+    ],
+  });
+  return Number(res.rows[0].id);
+}
+
+export async function setProductStatus(
+  id: number,
+  userId: number,
+  status: string
+): Promise<void> {
+  await initDb();
+  await db.execute({
+    sql: "UPDATE products SET status = ? WHERE id = ? AND user_id = ?",
+    args: [status, id, userId],
+  });
+}
+
+export async function listProductsByUser(userId: number): Promise<ProductRow[]> {
+  await initDb();
+  const res = await db.execute({
+    sql: `SELECT p.*, u.name AS author_name FROM products p
+          JOIN users u ON p.user_id = u.id
+          WHERE p.user_id = ? ORDER BY p.created_at DESC`,
+    args: [userId],
+  });
+  return res.rows.map((r) =>
+    mapProduct(r as unknown as Record<string, unknown>)
+  );
+}
+
+// ---- 意向单 ----
+
+function mapOrder(r: Record<string, unknown>): OrderRow {
+  return {
+    id: Number(r.id),
+    product_id: Number(r.product_id),
+    buyer_id: Number(r.buyer_id),
+    contact: (r.contact as string) || "",
+    message: (r.message as string) || "",
+    status: (r.status as string) || "待联系",
+    created_at: (r.created_at as string) || "",
+    product_title: (r.product_title as string) || "",
+    seller_id: Number(r.seller_id || 0),
+    buyer_name: (r.buyer_name as string) || "匿名",
+  };
+}
+
+export async function createOrder(input: {
+  productId: number;
+  buyerId: number;
+  contact: string;
+  message: string;
+}): Promise<void> {
+  await initDb();
+  await db.execute({
+    sql: "INSERT INTO orders (product_id, buyer_id, contact, message) VALUES (?, ?, ?, ?)",
+    args: [
+      input.productId,
+      input.buyerId,
+      input.contact.trim().slice(0, 100),
+      input.message.trim().slice(0, 500),
+    ],
+  });
+}
+
+export async function listOrdersForSeller(
+  sellerId: number
+): Promise<OrderRow[]> {
+  await initDb();
+  const res = await db.execute({
+    sql: `SELECT o.*, p.title AS product_title, p.user_id AS seller_id, u.name AS buyer_name
+          FROM orders o JOIN products p ON o.product_id = p.id
+          JOIN users u ON o.buyer_id = u.id
+          WHERE p.user_id = ? ORDER BY o.created_at DESC`,
+    args: [sellerId],
+  });
+  return res.rows.map((r) => mapOrder(r as unknown as Record<string, unknown>));
+}
+
+export async function listOrdersForBuyer(buyerId: number): Promise<OrderRow[]> {
+  await initDb();
+  const res = await db.execute({
+    sql: `SELECT o.*, p.title AS product_title, p.user_id AS seller_id, u.name AS buyer_name
+          FROM orders o JOIN products p ON o.product_id = p.id
+          JOIN users u ON o.buyer_id = u.id
+          WHERE o.buyer_id = ? ORDER BY o.created_at DESC`,
+    args: [buyerId],
+  });
+  return res.rows.map((r) => mapOrder(r as unknown as Record<string, unknown>));
+}
+
+export async function setOrderStatus(
+  id: number,
+  sellerId: number,
+  status: string
+): Promise<void> {
+  await initDb();
+  await db.execute({
+    sql: `UPDATE orders SET status = ? WHERE id = ? AND product_id IN
+          (SELECT id FROM products WHERE user_id = ?)`,
+    args: [status, id, sellerId],
+  });
+}
+
+// ---- 用户资料 ----
+
+export async function updateUserProfile(
+  userId: number,
+  bio: string
+): Promise<void> {
+  await initDb();
+  await db.execute({
+    sql: "UPDATE users SET bio = ? WHERE id = ?",
+    args: [bio.trim().slice(0, 200), userId],
+  });
+}
+
+export async function getUserByName(name: string): Promise<User | null> {
+  await initDb();
+  const res = await db.execute({
+    sql: "SELECT id, name, avatar, bio FROM users WHERE name = ?",
+    args: [name],
+  });
+  if (res.rows.length === 0) return null;
+  const r = res.rows[0];
+  return {
+    id: Number(r.id),
+    name: r.name as string,
+    avatar: (r.avatar as string) || "",
+    bio: (r.bio as string) || "",
+  };
+}
+
+export async function listProjectsByUser(userId: number): Promise<ProjectRow[]> {
+  await initDb();
+  const res = await db.execute({
+    sql: `SELECT p.*, u.name AS author_name FROM projects p
+          JOIN users u ON p.user_id = u.id
+          WHERE p.user_id = ? ORDER BY p.created_at DESC`,
+    args: [userId],
+  });
+  return res.rows.map((r) =>
+    mapProject(r as unknown as Record<string, unknown>)
+  );
 }

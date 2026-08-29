@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MakerHub · 造物主社区 — v5 动画首页</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: #0A0A0C; color: #E8E8EA;
+    -webkit-font-smoothing: antialiased; overflow-x: hidden;
+  }
+  .serif { font-family: "Songti SC", "Noto Serif SC", "STSong", serif; }
+  .mono { font-family: "SF Mono", Menlo, monospace; }
+
+  /* ========== 导航 ========== */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; height: 72px; padding: 0 clamp(20px, 5vw, 56px);
+    background: rgba(10,10,12,0.7); backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+  .logo .l-name { font-size: 16px; font-weight: 600; letter-spacing: 2px; color: #F0F0F2; }
+  .logo .l-sub { font-size: 10px; color: #5E5E68; letter-spacing: 4px; margin-top: 1px; }
+  nav .links { display: flex; gap: clamp(18px, 3vw, 36px); margin-left: clamp(24px, 5vw, 64px); }
+  nav .links a {
+    color: #8E8E98; text-decoration: none; font-size: 14px; letter-spacing: 1px;
+    position: relative; padding: 4px 0; transition: color .2s;
+  }
+  nav .links a::after { content: ''; position: absolute; left: 0; bottom: 0; width: 0; height: 1px; background: #4C8DFF; transition: width .25s ease; }
+  nav .links a:hover { color: #F0F0F2; }
+  nav .links a:hover::after { width: 100%; }
+  .nav-right { margin-left: auto; display: flex; gap: 18px; align-items: center; }
+  .nav-right .login { color: #8E8E98; font-size: 14px; text-decoration: none; transition: color .2s; }
+  .nav-right .login:hover { color: #F0F0F2; }
+  .btn {
+    display: inline-block; padding: 10px 22px; border-radius: 8px;
+    font-size: 14px; font-weight: 600; text-decoration: none; cursor: pointer;
+    border: 1px solid transparent; transition: all .2s; letter-spacing: 1px;
+  }
+  .btn-primary { background: #F2F2F4; color: #0A0A0C; }
+  .btn-primary:hover { background: #fff; transform: translateY(-1px); }
+  .btn-outline { border-color: rgba(255,255,255,0.16); color: #D0D0D6; }
+  .btn-outline:hover { border-color: rgba(76,141,255,0.6); color: #fff; }
+
+  /* ========== Hero ========== */
+  .hero { position: relative; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 0 clamp(20px, 5vw, 56px); overflow: hidden; }
+  #particles { position: absolute; inset: 0; z-index: 0; }
+  .hero-inner { position: relative; z-index: 2; max-width: 860px; }
+  .builder-box { position: absolute; right: 2%; top: 50%; transform: translateY(-50%); width: clamp(320px, 36vw, 500px); height: clamp(320px, 36vw, 500px); z-index: 1; }
+  .builder-box svg { width: 100%; height: 100%; overflow: visible; }
+  .builder-box .part { transition: transform .7s cubic-bezier(.25,.8,.3,1), opacity .5s ease; }
+  .builder-box .part.dim { opacity: .12; }
+  .builder-box .glow { position: absolute; inset: 12%; border-radius: 50%; background: radial-gradient(circle, rgba(76,141,255,0.13), transparent 65%); pointer-events: none; transition: opacity .8s; opacity: .35; }
+  .builder-box .glow.strong { opacity: 1; }
+  .cu-label { position: absolute; left: 50%; bottom: 4%; transform: translateX(-50%); text-align: center; opacity: 0; transition: opacity .4s ease; pointer-events: none; white-space: nowrap; }
+  .cu-label.show { opacity: 1; }
+  .cu-label b { display: block; font-size: 17px; font-weight: 700; letter-spacing: 4px; color: #F0F0F2; }
+  .cu-label span { display: block; margin-top: 4px; font-size: 12px; letter-spacing: 2px; color: #7FA8FF; }
+  @media (max-width: 1080px) { .builder-box { display: none; } }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: 12.5px; color: #8E8E98; letter-spacing: 3px;
+    border: 1px solid rgba(255,255,255,0.1); border-radius: 999px; padding: 8px 18px;
+    animation: fadeUp .8s .1s both;
+  }
+  .hero-tag .dot { width: 5px; height: 5px; border-radius: 50%; background: #4C8DFF; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
+  .hero h1 { font-size: clamp(44px, 7vw, 84px); font-weight: 900; line-height: 1.12; letter-spacing: 4px; margin-top: 34px; color: #F4F4F6; }
+  .hero h1 .line { display: block; overflow: hidden; }
+  .hero h1 .line > span { display: inline-block; transform: translateY(110%); animation: rise 1s cubic-bezier(.2,.7,.2,1) forwards; }
+  .hero h1 .line:nth-child(2) > span { animation-delay: .25s; }
+  @keyframes rise { to { transform: translateY(0); } }
+  .hero h1 .accent { color: #4C8DFF; }
+  .hero .sub { margin-top: 28px; max-width: 560px; font-size: 16px; line-height: 1.9; color: #8E8E98; animation: fadeUp .8s .5s both; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+  .hero-cta { display: flex; gap: 14px; margin-top: 44px; animation: fadeUp .8s .65s both; }
+  .hero-cta .btn { padding: 14px 32px; font-size: 15px; }
+
+
+  .scroll-hint { position: absolute; bottom: 34px; left: 50%; transform: translateX(-50%); z-index: 2; text-align: center; color: #5E5E68; font-size: 11px; letter-spacing: 4px; animation: fadeUp 1s 1.2s both; }
+  .scroll-hint .bar { width: 1px; height: 44px; margin: 10px auto 0; background: linear-gradient(#4C8DFF, transparent); animation: drop 1.8s ease-in-out infinite; }
+  @keyframes drop { 0% { transform: scaleY(0); transform-origin: top; } 45% { transform: scaleY(1); transform-origin: top; } 55% { transform: scaleY(1); transform-origin: bottom; } 100% { transform: scaleY(0); transform-origin: bottom; } }
+
+  /* ========== 造物旅程（v6 炫酷版） ========== */
+  .journey { position: relative; padding: clamp(80px, 10vw, 140px) clamp(20px, 5vw, 56px) 100px; border-top: 1px solid rgba(255,255,255,0.05); overflow: hidden; }
+  #net { position: absolute; inset: 0; z-index: 0; opacity: .8; }
+  .j-inner { position: relative; z-index: 2; }
+  .j-head { text-align: center; margin-bottom: clamp(36px, 5vw, 64px); }
+  .j-head .kicker { font-size: 12px; color: #5E5E68; letter-spacing: 5px; }
+  .j-head h2 { font-size: clamp(28px, 4vw, 40px); font-weight: 800; letter-spacing: 3px; margin-top: 14px; }
+
+  .stage { display: grid; max-width: 780px; margin: 0 auto; }
+  .scene {
+    grid-area: 1 / 1; min-height: 330px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center;
+    opacity: 0; visibility: hidden; transform: translateY(16px) scale(.985); filter: blur(8px);
+    transition: opacity .5s ease, transform .5s ease, filter .5s ease, visibility .5s;
+  }
+  .scene.active { opacity: 1; visibility: visible; transform: none; filter: none; }
+
+  /* 场景1：梦想 —— 逐字浮现 */
+  .scene-idea .lead { font-size: 15px; color: #8E8E98; letter-spacing: 2px; opacity: 0; transform: translateY(8px); transition: all .6s .15s; }
+  .scene-idea.active .lead { opacity: 1; transform: none; }
+  .scene-idea .big { font-size: clamp(32px, 5vw, 50px); font-weight: 900; letter-spacing: 4px; margin-top: 24px; color: #F4F4F6; }
+  .scene-idea .big .ch { display: inline-block; opacity: 0; transform: translateY(24px) rotate(3deg); transition: all .5s cubic-bezier(.2,.7,.2,1); }
+  .scene-idea .big .cursor { display: inline-block; width: 3px; height: .85em; background: #4C8DFF; vertical-align: -0.1em; animation: blink .8s infinite; margin-left: 6px; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .scene-idea .trail { margin-top: 20px; font-size: 13.5px; color: #5E5E68; letter-spacing: 3px; opacity: 0; transition: opacity .6s 1.4s; }
+  .scene-idea.active .trail { opacity: 1; }
+  .scene-idea .halo { position: absolute; width: 420px; height: 420px; border-radius: 50%; background: radial-gradient(circle, rgba(76,141,255,0.10), transparent 65%); animation: haloPulse 3.2s ease-in-out infinite; pointer-events: none; }
+  @keyframes haloPulse { 0%,100% { transform: scale(.85); opacity: .5; } 50% { transform: scale(1.1); opacity: 1; } }
+
+  /* 场景2：设计 */
+  .scene-bom { gap: 10px; }
+  .scene-bom .cap { font-size: 14px; color: #8E8E98; letter-spacing: 2px; margin-bottom: 8px; }
+  .bom-line { position: relative; display: flex; align-items: center; gap: 18px; width: min(480px, 86vw); padding: 13px 20px; border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; background: rgba(255,255,255,0.02); opacity: 0; transform: translateX(-16px); transition: all .45s ease; font-size: 14px; overflow: hidden; }
+  .bom-line::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: #4C8DFF; transform: scaleY(0); transform-origin: top; transition: transform .4s .15s ease; }
+  .bom-line.show { opacity: 1; transform: none; }
+  .bom-line.show::before { transform: scaleY(1); }
+  .bom-line .n { color: #5E5E68; font-size: 11px; width: 26px; font-family: "SF Mono", Menlo, monospace; }
+  .bom-line .nm { flex: 1; letter-spacing: .5px; }
+  .bom-line .qt { color: #4C8DFF; font-family: "SF Mono", Menlo, monospace; font-size: 13px; }
+  .bom-line .st { color: #3E8D5F; font-size: 11px; border: 1px solid rgba(94,205,133,0.3); padding: 1px 7px; border-radius: 3px; }
+  .bom-line .ok { position: absolute; right: 14px; color: #3E8D5F; font-size: 13px; opacity: 0; transform: scale(.4); transition: all .3s .5s; }
+  .bom-line.show .ok { opacity: 1; transform: scale(1); }
+  .bom-done { margin-top: 14px; font-size: 12.5px; color: #3E8D5F; letter-spacing: 2px; opacity: 0; transform: translateY(8px); transition: all .5s; border: 1px solid rgba(94,205,133,0.25); padding: 6px 16px; border-radius: 999px; }
+  .bom-done.show { opacity: 1; transform: none; }
+
+  /* 场景3：买料 */
+  .scene-shop { gap: 0; }
+  .scene-shop .cap { font-size: 14px; color: #8E8E98; letter-spacing: 2px; margin-bottom: 24px; }
+  .shop-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+  .shop-btn { position: relative; padding: 12px 28px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.14); color: #C8C8CE; font-size: 14px; letter-spacing: 2px; opacity: 0; transform: translateY(14px) scale(.92); transition: all .4s cubic-bezier(.2,.8,.3,1.2); cursor: pointer; }
+  .shop-btn.show { opacity: 1; transform: none; }
+  .shop-btn.b1 { border-color: rgba(255,138,76,0.4); color: #FFA26E; }
+  .shop-btn.b2 { border-color: rgba(76,141,255,0.4); color: #7FA8FF; }
+  .shop-btn.b3 { border-color: rgba(240,120,120,0.4); color: #F58A8A; }
+  .arcs { width: min(560px, 88vw); height: 64px; margin: 4px auto 0; display: block; }
+  .arcs path { fill: none; stroke-width: 1.4; stroke-dasharray: 200; stroke-dashoffset: 200; transition: stroke-dashoffset .7s ease; }
+  .scene-shop.show-arcs .arcs path { stroke-dashoffset: 0; }
+  .scene-shop .cost { margin-top: 6px; font-size: 14px; color: #5E5E68; letter-spacing: 2px; opacity: 0; transform: translateY(8px); transition: all .5s .6s; }
+  .scene-shop.show-arcs .cost { opacity: 1; transform: none; }
+  .scene-shop .cost b { color: #C8C8CE; font-family: "SF Mono", Menlo, monospace; font-weight: 600; font-size: 16px; }
+
+  /* 场景4：交易 */
+  .scene-trade { gap: 22px; }
+  .scene-trade .cap { font-size: 14px; color: #8E8E98; letter-spacing: 2px; }
+  .chain { display: flex; align-items: center; gap: 14px; }
+  .chain .node { position: relative; padding: 10px 18px; border: 1px solid rgba(255,255,255,0.14); border-radius: 7px; font-size: 13px; color: #C8C8CE; letter-spacing: 1px; opacity: 0; transform: translateY(10px) scale(.95); transition: all .4s ease; }
+  .chain .node.show { opacity: 1; transform: none; }
+  .chain .node.lit { border-color: rgba(76,141,255,0.6); color: #7FA8FF; box-shadow: 0 0 22px rgba(76,141,255,0.3); }
+  .chain .node.lit::after { content: ''; position: absolute; inset: -4px; border-radius: 10px; border: 1px solid rgba(76,141,255,0.4); animation: ringOut 1.2s ease-out infinite; }
+  @keyframes ringOut { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.25); } }
+  .chain .link { color: #3A3A44; font-size: 14px; opacity: 0; transition: opacity .3s .3s; }
+  .chain.show-links .link { opacity: 1; color: #4C8DFF; text-shadow: 0 0 8px rgba(76,141,255,0.6); }
+  .scene-trade .done { font-size: 15px; letter-spacing: 2px; color: #C8C8CE; opacity: 0; transition: opacity .5s .5s; }
+  .scene-trade.show-done .done { opacity: 1; }
+  .scene-trade .done b { color: #4C8DFF; font-family: "SF Mono", Menlo, monospace; font-weight: 600; }
+
+  /* 步骤条 + 进度连线 */
+  .steps { display: flex; gap: clamp(18px, 4vw, 44px); justify-content: center; margin-top: clamp(40px, 5vw, 60px); position: relative; }
+  .steps::before { content: ''; position: absolute; top: 3px; left: 8%; right: 8%; height: 1px; background: rgba(255,255,255,0.06); }
+  .steps .track { position: absolute; top: 3px; left: 8%; height: 1px; width: 0%; background: linear-gradient(90deg, #4C8DFF, rgba(76,141,255,0.3)); transition: width .8s ease; }
+  .steps .sp { position: relative; display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: #4A4A54; letter-spacing: 2px; transition: color .3s; }
+  .steps .sp .sd { width: 7px; height: 7px; border-radius: 50%; background: #33333C; transition: all .3s; z-index: 1; }
+  .steps .sp.on { color: #C8C8CE; }
+  .steps .sp.on .sd { background: #4C8DFF; box-shadow: 0 0 10px rgba(76,141,255,0.9); }
+
+  /* ========== 工具板块 ========== */
+  .section { max-width: 1120px; margin: 0 auto; padding: 100px clamp(20px, 4vw, 48px); }
+  .section-head { margin-bottom: 40px; }
+  .section-head .kicker { font-size: 12px; color: #5E5E68; letter-spacing: 5px; }
+  .section-head h2 { font-size: clamp(26px, 3.5vw, 36px); font-weight: 800; letter-spacing: 2px; margin-top: 12px; }
+  .tools { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+  .tool { border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 26px 22px; background: #0F0F12; transition: all .2s; cursor: pointer; }
+  .tool:hover { border-color: rgba(76,141,255,0.45); transform: translateY(-3px); }
+  .tool .t-index { font-size: 11px; color: #4A4A54; font-family: "SF Mono", Menlo, monospace; }
+  .tool h3 { font-size: 16px; font-weight: 600; margin-top: 12px; letter-spacing: 1px; }
+  .tool p { font-size: 12.5px; color: #6E6E78; margin-top: 8px; line-height: 1.7; }
+  .tool .t-tag { display: inline-block; margin-top: 14px; font-size: 11px; color: #8FB6FF; border: 1px solid rgba(76,141,255,0.25); padding: 3px 10px; border-radius: 4px; }
+
+  footer { text-align: center; padding: 48px 24px; border-top: 1px solid rgba(255,255,255,0.05); color: #4A4A54; font-size: 12px; letter-spacing: 2px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="#">
+    <svg width="34" height="34" viewBox="0 0 34 34" fill="none">
+      <rect x="1" y="1" width="32" height="32" rx="7" stroke="rgba(255,255,255,0.14)"/>
+      <path d="M9 25 V11 H13.5 L17 17 L20.5 11 H25 V25" stroke="#F0F0F2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="9" cy="9" r="2.6" fill="#4C8DFF"/>
+      <circle cx="9" cy="9" r="5" fill="rgba(76,141,255,0.25)"/>
+    </svg>
+    <span>
+      <span class="l-name" style="display:block;">MakerHub</span>
+      <span class="l-sub" style="display:block;">造物主社区</span>
+    </span>
+  </a>
+  <div class="links">
+    <a href="#">作品</a>
+    <a href="#">设计清单</a>
+    <a href="#">工具</a>
+    <a href="#">市场</a>
+  </div>
+  <div class="nav-right">
+    <a class="login" href="#">登录</a>
+    <a class="btn btn-primary" href="#">发布作品</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <canvas id="particles"></canvas>
+  <div class="hero-inner">
+    <span class="hero-tag"><span class="dot"></span>实物 VibeCoding 集合社区</span>
+    <h1>
+      <span class="line"><span>用 AI 造物，</span></span>
+      <span class="line"><span>晒出来，<span class="accent">买得到</span></span></span>
+    </h1>
+    <p class="sub">从想法到实物，只差一次生成。发现工具、挑一个设计清单，作品回到这里展示、找料、交易。</p>
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="#">去生成我的第一个实物</a>
+      <a class="btn btn-outline" href="#">浏览设计清单</a>
+    </div>
+  </div>
+  <div class="builder-box">
+    <div class="glow"></div>
+    <svg id="drone" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+      <!-- 机架四臂（局部坐标：从 0,0 伸向角） -->
+      <g class="part arm" data-a="0"><line x1="0" y1="0" x2="120" y2="120" stroke="#3E4A5E" stroke-width="7" stroke-linecap="round"/></g>
+      <g class="part arm" data-a="1"><line x1="0" y1="0" x2="-120" y2="120" stroke="#3E4A5E" stroke-width="7" stroke-linecap="round"/></g>
+      <g class="part arm" data-a="2"><line x1="0" y1="0" x2="120" y2="-120" stroke="#3E4A5E" stroke-width="7" stroke-linecap="round"/></g>
+      <g class="part arm" data-a="3"><line x1="0" y1="0" x2="-120" y2="-120" stroke="#3E4A5E" stroke-width="7" stroke-linecap="round"/></g>
+      <!-- 飞控板（整机大脑） -->
+      <g class="part fc">
+        <rect x="-28" y="-20" width="56" height="40" rx="4" fill="rgba(22,32,44,0.9)" stroke="#4C8DFF" stroke-width="1.4"/>
+        <rect x="-13" y="-9" width="13" height="13" rx="2" fill="none" stroke="#7FA8FF" stroke-width="1"/>
+        <rect x="3" y="-9" width="18" height="18" rx="2" fill="rgba(76,141,255,0.25)"/>
+        <line x1="-20" y1="12" x2="20" y2="12" stroke="#3E4A5E" stroke-width="1"/>
+        <line x1="-20" y1="16" x2="14" y2="16" stroke="#3E4A5E" stroke-width="1"/>
+      </g>
+      <!-- 电池 -->
+      <g class="part bat">
+        <rect x="-26" y="-14" width="52" height="28" rx="4" fill="rgba(24,34,48,0.9)" stroke="#7FA8FF" stroke-width="1.3"/>
+        <line x1="-16" y1="-6" x2="-16" y2="6" stroke="#7FA8FF" stroke-width="2"/>
+        <line x1="-10" y1="-6" x2="-10" y2="6" stroke="#7FA8FF" stroke-width="2"/>
+      </g>
+      <!-- 摄像头 -->
+      <g class="part cam">
+        <circle r="13" fill="rgba(26,36,50,0.9)" stroke="#4C8DFF" stroke-width="1.4"/>
+        <circle r="5.5" fill="rgba(76,141,255,0.65)"/>
+      </g>
+      <!-- 电机 ×4 -->
+      <g class="part motor" data-m="0"><circle r="13" fill="rgba(26,32,44,0.9)" stroke="#8E8E98" stroke-width="1.3"/><circle r="4" fill="#8E8E98"/></g>
+      <g class="part motor" data-m="1"><circle r="13" fill="rgba(26,32,44,0.9)" stroke="#8E8E98" stroke-width="1.3"/><circle r="4" fill="#8E8E98"/></g>
+      <g class="part motor" data-m="2"><circle r="13" fill="rgba(26,32,44,0.9)" stroke="#8E8E98" stroke-width="1.3"/><circle r="4" fill="#8E8E98"/></g>
+      <g class="part motor" data-m="3"><circle r="13" fill="rgba(26,32,44,0.9)" stroke="#8E8E98" stroke-width="1.3"/><circle r="4" fill="#8E8E98"/></g>
+      <!-- 螺旋桨 ×4（十字桨叶） -->
+      <g class="part prop" data-p="0"><ellipse rx="26" ry="5.5" fill="rgba(76,141,255,0.16)" stroke="#4C8DFF" stroke-width="1.2"/><ellipse rx="5.5" ry="26" fill="rgba(76,141,255,0.12)" stroke="#4C8DFF" stroke-width="1"/></g>
+      <g class="part prop" data-p="1"><ellipse rx="26" ry="5.5" fill="rgba(76,141,255,0.16)" stroke="#4C8DFF" stroke-width="1.2"/><ellipse rx="5.5" ry="26" fill="rgba(76,141,255,0.12)" stroke="#4C8DFF" stroke-width="1"/></g>
+      <g class="part prop" data-p="2"><ellipse rx="26" ry="5.5" fill="rgba(76,141,255,0.16)" stroke="#4C8DFF" stroke-width="1.2"/><ellipse rx="5.5" ry="26" fill="rgba(76,141,255,0.12)" stroke="#4C8DFF" stroke-width="1"/></g>
+      <g class="part prop" data-p="3"><ellipse rx="26" ry="5.5" fill="rgba(76,141,255,0.16)" stroke="#4C8DFF" stroke-width="1.2"/><ellipse rx="5.5" ry="26" fill="rgba(76,141,255,0.12)" stroke="#4C8DFF" stroke-width="1"/></g>
+      <!-- 螺丝点缀 -->
+      <g class="part scr" data-s="0"><circle r="2.5" fill="#8E8E98"/></g>
+      <g class="part scr" data-s="1"><circle r="2.5" fill="#8E8E98"/></g>
+    </svg>
+    <div class="cu-label"><b>飞控板</b><span>整机大脑 · 主控 MCU</span></div>
+  </div>
+  <div class="scroll-hint">SCROLL<div class="bar"></div></div>
+</section>
+
+<section class="journey">
+  <canvas id="net"></canvas>
+  <div class="j-inner">
+    <div class="j-head">
+      <div class="kicker">FROM IDEA TO REALITY</div>
+      <h2>造物的旅程</h2>
+    </div>
+    <div class="stage">
+      <div class="scene scene-idea active">
+        <div class="halo"></div>
+        <div class="lead">有没有儿时造物的梦想？</div>
+        <div class="big serif">比如，拍手就能点亮的灯<span class="cursor"></span></div>
+        <div class="trail">现在，让 AI 帮你实现</div>
+      </div>
+      <div class="scene scene-bom">
+        <div class="cap">说出想法 · AI 生成零件清单</div>
+        <div class="bom-line" data-i="0"><span class="n">01</span><span class="nm">Arduino Nano V3.0</span><span class="qt">×1</span><span class="st">主控</span><span class="ok">✓</span></div>
+        <div class="bom-line" data-i="1"><span class="n">02</span><span class="nm">KY-038 麦克风模块</span><span class="qt">×1</span><span class="st">传感</span><span class="ok">✓</span></div>
+        <div class="bom-line" data-i="2"><span class="n">03</span><span class="nm">WS2812B 5V LED 灯带</span><span class="qt">×1</span><span class="st">输出</span><span class="ok">✓</span></div>
+        <div class="bom-line" data-i="3"><span class="n">04</span><span class="nm">3D 打印外壳 + 螺丝</span><span class="qt">×1</span><span class="st">结构</span><span class="ok">✓</span></div>
+        <div class="bom-done">✔ 零件清单已生成 · 共 4 项</div>
+      </div>
+      <div class="scene scene-shop">
+        <div class="cap">国内购买链接 · 一键直达</div>
+        <div class="shop-row">
+          <span class="shop-btn b1">淘宝</span>
+          <span class="shop-btn b2">1688</span>
+          <span class="shop-btn b3">拼多多</span>
+        </div>
+        <svg class="arcs" viewBox="0 0 560 64" preserveAspectRatio="none">
+          <path d="M110 2 C110 34, 200 48, 280 58" stroke="rgba(255,138,76,0.55)"/>
+          <path d="M280 2 C280 34, 280 48, 280 58" stroke="rgba(76,141,255,0.55)"/>
+          <path d="M450 2 C450 34, 360 48, 280 58" stroke="rgba(240,120,120,0.55)"/>
+        </svg>
+        <div class="cost">材料成本 <b>¥45</b> · 两天到货</div>
+      </div>
+      <div class="scene scene-trade">
+        <div class="cap">成品出炉 · 挂链交易</div>
+        <div class="chain">
+          <span class="node">作品</span><span class="link">→</span>
+          <span class="node">意向单</span><span class="link">→</span>
+          <span class="node">闲鱼成交</span>
+        </div>
+        <div class="done">造物，变成 <b>可交易的作品</b></div>
+      </div>
+    </div>
+    <div class="steps">
+      <div class="track"></div>
+      <span class="sp on"><span class="sd"></span>梦想</span>
+      <span class="sp"><span class="sd"></span>设计</span>
+      <span class="sp"><span class="sd"></span>买料</span>
+      <span class="sp"><span class="sd"></span>交易</span>
+    </div>
+  </div>
+</section>
+<section class="section">
+  <div class="section-head"><div class="kicker">TOOLS</div><h2>接入的 AI 造物工具</h2></div>
+  <div class="tools">
+    <div class="tool"><div class="t-index">01</div><h3>Blueprint</h3><p>输入想法，输出原理图、零件清单、3D 外壳与组装说明</p><span class="t-tag">全流程生成</span></div>
+    <div class="tool"><div class="t-index">02</div><h3>Cirkit Designer</h3><p>浏览器内电路设计与仿真，AI 选型，可导出 BOM</p><span class="t-tag">可导出 BOM</span></div>
+    <div class="tool"><div class="t-index">03</div><h3>Schematik</h3><p>自然语言直接生成接线图、BOM 与固件代码</p><span class="t-tag">自然语言</span></div>
+    <div class="tool"><div class="t-index">04</div><h3>Flux.ai</h3><p>项目内嵌 AI 设计助手，组件级上下文理解</p><span class="t-tag">设计助手</span></div>
+  </div>
+</section>
+
+<footer>MakerHub · 造物主社区 — AI 造物 · 晒出来 · 买得到</footer>
+
+<script>
+// Hero 粒子
+(function () {
+  const canvas = document.getElementById('particles');
+  const ctx = canvas.getContext('2d');
+  let w, h, pts = [];
+  function resize() { w = canvas.width = canvas.offsetWidth; h = canvas.height = canvas.offsetHeight; }
+  resize(); window.addEventListener('resize', resize);
+  const N = 46;
+  for (let i = 0; i < N; i++) pts.push({ x: Math.random() * w, y: Math.random() * h, r: Math.random() * 1.6 + 0.4, vx: (Math.random() - .5) * .18, vy: (Math.random() - .5) * .18, a: Math.random() * .35 + .08, blue: Math.random() < .3 });
+  function tick() {
+    ctx.clearRect(0, 0, w, h);
+    for (const p of pts) {
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0 || p.x > w) p.vx *= -1;
+      if (p.y < 0 || p.y > h) p.vy *= -1;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = p.blue ? `rgba(76,141,255,${p.a})` : `rgba(220,224,232,${p.a * .7})`;
+      ctx.fill();
+    }
+    requestAnimationFrame(tick);
+  }
+  tick();
+})();
+
+// 造物无人机：组装 → 成形 → 爆炸拆解 → 零部件特写 → 循环
+(function () {
+  const svg = document.getElementById('drone');
+  if (!svg) return;
+  const glow = document.querySelector('.builder-box .glow');
+  const label = document.querySelector('.cu-label');
+
+  const P = {};
+  const get = (sel) => Array.from(svg.querySelectorAll(sel));
+  const CORNERS = [[80, 80], [320, 80], [80, 320], [320, 320]];
+  get('.part.arm').forEach((el, i) => {
+    const out = [[150, 150], [250, 150], [150, 250], [250, 250]];
+    P['arm' + i] = { el, a: CORNERS[i], e: out[i] };
+  });
+  get('.part.fc').forEach(el => { P.fc = { el, a: [200, 200], e: [200, 118] }; });
+  get('.part.bat').forEach(el => { P.bat = { el, a: [200, 226], e: [200, 276] }; });
+  get('.part.cam').forEach(el => { P.cam = { el, a: [200, 168], e: [200, 58] }; });
+  get('.part.motor').forEach((el, i) => {
+    const out = [[48, 48], [352, 48], [48, 352], [352, 352]];
+    P['motor' + i] = { el, a: CORNERS[i], e: out[i] };
+  });
+  get('.part.prop').forEach((el, i) => {
+    const out = [[48, 18], [352, 18], [18, 352], [382, 352]];
+    P['prop' + i] = { el, a: CORNERS[i], e: out[i] };
+  });
+  get('.part.scr').forEach((el, i) => {
+    const spots = [[138, 138], [262, 138]];
+    P['scr' + i] = { el, a: spots[i], e: [spots[i][0] + 26, spots[i][1] + 26] };
+  });
+
+  const CLOSEUPS = [
+    { key: 'fc', name: '飞控板', role: '整机大脑 · 主控 MCU' },
+    { key: 'bat', name: '电池', role: '能量核心 · 18650 锂电' },
+    { key: 'cam', name: '摄像头', role: '视觉之眼 · 高清镜头' },
+    { key: 'motor0', name: '无刷电机', role: '动力之源 · 高速电机' },
+    { key: 'prop0', name: '螺旋桨', role: '升力之翼 · 碳纤桨叶' }
+  ];
+
+  function applyPart(key, xy, noTrans) {
+    const el = P[key].el;
+    if (noTrans) el.style.transition = 'none';
+    el.style.transform = `translate(${xy[0]}px, ${xy[1]}px)`;
+  }
+  function restoreTrans(key) { P[key].el.style.transition = ''; }
+  function dimExcept(key) {
+    Object.keys(P).forEach(k => P[k].el.classList.toggle('dim', !!key && k !== key));
+  }
+  function easeOutBack(t) { const c = 1.70158; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); }
+
+  const CYCLE = 15000;
+  const T = { asm: 1500, formed: 3000, xpl: 4400, cu: 14400 };
+  const CU_LEN = 2000;
+  let t0 = performance.now() - (window.__OFF || 0), curCu = -1;
+
+  // 初始：全部放在爆炸位
+  Object.keys(P).forEach(k => applyPart(k, P[k].e, true));
+
+  function tick(now) {
+    const t = (now - t0) % CYCLE;
+    if (t < T.asm) {
+      // 组装：爆炸位 → 组装位（逐帧插值，禁用 transition）
+      const names = Object.keys(P);
+      names.forEach((k, i) => {
+        const lt = Math.max(0, Math.min(1, (t - i * 40) / Math.max(1, T.asm - i * 40)));
+        const e = easeOutBack(lt);
+        const a = P[k].a, ex = P[k].e;
+        applyPart(k, [ex[0] + (a[0] - ex[0]) * e, ex[1] + (a[1] - ex[1]) * e], true);
+      });
+      dimExcept(null);
+      label.classList.remove('show');
+      glow.classList.remove('strong');
+    } else if (t < T.formed) {
+      // 成形：保持组装位，光晕增强
+      Object.keys(P).forEach(k => { restoreTrans(k); applyPart(k, P[k].a); });
+      glow.classList.add('strong');
+    } else if (t < T.xpl) {
+      // 爆炸：组装位 → 爆炸位
+      const names = Object.keys(P);
+      names.forEach((k, i) => {
+        const lt = Math.max(0, Math.min(1, (t - T.formed - i * 30) / Math.max(1, T.xpl - T.formed - i * 30)));
+        const e = easeOutBack(lt);
+        const a = P[k].a, ex = P[k].e;
+        applyPart(k, [a[0] + (ex[0] - a[0]) * e, a[1] + (ex[1] - a[1]) * e], true);
+      });
+      glow.classList.remove('strong');
+    } else {
+      // 零部件特写
+      const ci = Math.min(CLOSEUPS.length - 1, Math.floor((t - T.xpl) / CU_LEN));
+      if (ci !== curCu) {
+        curCu = ci;
+        const c = CLOSEUPS[ci];
+        dimExcept(c.key);
+        label.querySelector('b').textContent = c.name;
+        label.querySelector('span').textContent = c.role;
+        label.classList.add('show');
+      }
+      const c = CLOSEUPS[ci];
+      Object.keys(P).forEach(k => {
+        restoreTrans(k);
+        if (k === c.key) P[k].el.style.transform = 'translate(200px, 200px) scale(2.6)';
+        else applyPart(k, P[k].e);
+      });
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+
+// 旅程粒子连线网络
+(function () {
+  const canvas = document.getElementById('net');
+  const ctx = canvas.getContext('2d');
+  let w, h, pts = [];
+  function resize() { w = canvas.width = canvas.offsetWidth; h = canvas.height = canvas.offsetHeight; }
+  resize(); window.addEventListener('resize', resize);
+  const N = 42;
+  for (let i = 0; i < N; i++) pts.push({ x: Math.random() * w, y: Math.random() * h, r: Math.random() * 1.5 + 0.4, vx: (Math.random() - .5) * .22, vy: (Math.random() - .5) * .22 });
+  function tick() {
+    ctx.clearRect(0, 0, w, h);
+    for (const p of pts) {
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0 || p.x > w) p.vx *= -1;
+      if (p.y < 0 || p.y > h) p.vy *= -1;
+    }
+    for (let i = 0; i < N; i++) for (let j = i + 1; j < N; j++) {
+      const dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y;
+      const d = Math.sqrt(dx * dx + dy * dy);
+      if (d < 110) {
+        ctx.beginPath(); ctx.moveTo(pts[i].x, pts[i].y); ctx.lineTo(pts[j].x, pts[j].y);
+        ctx.strokeStyle = `rgba(76,141,255,${(1 - d / 110) * 0.22})`; ctx.lineWidth = 1; ctx.stroke();
+      }
+    }
+    for (const p of pts) {
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(160,180,220,0.4)'; ctx.fill();
+    }
+    requestAnimationFrame(tick);
+  }
+  tick();
+})();
+
+// 造物旅程 4 步循环（v6）
+(function () {
+  const scenes = document.querySelectorAll('.scene');
+  const steps = document.querySelectorAll('.steps .sp');
+  const track = document.querySelector('.steps .track');
+  const T = [4200, 4200, 3600, 4000];
+  let idx = 0;
+
+  function splitChars() {
+    const big = document.querySelector('.scene-idea .big');
+    const text = big.childNodes[0].textContent;
+    big.childNodes[0].textContent = '';
+    text.split('').forEach((c, i) => {
+      const span = document.createElement('span');
+      span.className = 'ch';
+      span.textContent = c;
+      span.style.transitionDelay = (0.35 + i * 0.06) + 's';
+      big.appendChild(span);
+    });
+  }
+  splitChars();
+
+  function runBom() {
+    document.querySelectorAll('.bom-line').forEach((l, i) => setTimeout(() => l.classList.add('show'), 150 + i * 420));
+    setTimeout(() => document.querySelector('.bom-done').classList.add('show'), 150 + 4 * 420 + 300);
+  }
+  function runShop() {
+    document.querySelectorAll('.shop-btn').forEach((b, i) => setTimeout(() => b.classList.add('show'), 150 + i * 300));
+    setTimeout(() => document.querySelector('.scene-shop').classList.add('show-arcs'), 150 + 3 * 300 + 500);
+  }
+  function runTrade() {
+    document.querySelectorAll('.chain .node').forEach((n, i) => setTimeout(() => { n.classList.add('show'); if (i === 2) n.classList.add('lit'); }, 300 + i * 600));
+    setTimeout(() => document.querySelector('.chain').classList.add('show-links'), 350);
+    setTimeout(() => document.querySelector('.scene-trade').classList.add('show-done'), 2400);
+  }
+
+  function activate(n) {
+    scenes.forEach((sc, i) => sc.classList.toggle('active', i === n));
+    steps.forEach((sp, i) => sp.classList.toggle('on', i === n));
+    track.style.width = (n === 0 ? 0 : n / 3 * 84) + '%';
+    document.querySelectorAll('.bom-line').forEach(l => l.classList.remove('show'));
+    document.querySelector('.bom-done').classList.remove('show');
+    document.querySelectorAll('.shop-btn').forEach(b => b.classList.remove('show'));
+    document.querySelector('.scene-shop').classList.remove('show-arcs');
+    document.querySelectorAll('.chain .node').forEach(nn => { nn.classList.remove('show', 'lit'); });
+    document.querySelector('.chain').classList.remove('show-links');
+    document.querySelector('.scene-trade').classList.remove('show-done');
+    if (n === 1) runBom();
+    if (n === 2) runShop();
+    if (n === 3) runTrade();
+  }
+
+  (function loop() {
+    activate(idx);
+    setTimeout(() => { idx = (idx + 1) % 4; loop(); }, T[idx]);
+  })();
+})();
+</script>
+</body>
+</html>

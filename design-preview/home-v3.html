@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MakerHub · 造物主社区 — 视觉样板 v3</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: #0B0B0D;
+    color: #E8E8EA;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  /* 宋体标题（macOS 系统宋体预览；生产环境用思源宋体 Noto Serif SC） */
+  .serif { font-family: "Songti SC", "Noto Serif SC", "STSong", serif; }
+
+  /* ===== 导航 ===== */
+  nav {
+    position: sticky; top: 0; z-index: 50;
+    display: flex; align-items: center;
+    height: 64px; padding: 0 48px;
+    background: rgba(11,11,13,0.85); backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .logo { display: flex; align-items: center; gap: 12px; font-size: 16px; font-weight: 700; letter-spacing: 0.5px; }
+  .logo-mark {
+    width: 28px; height: 28px; border-radius: 6px;
+    background: #4C8DFF; color: #0B0B0D;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 900;
+  }
+  nav .links { display: flex; gap: 28px; margin-left: 44px; }
+  nav .links a { color: #9A9AA3; text-decoration: none; font-size: 14px; transition: color .15s; }
+  nav .links a:hover { color: #F2F2F4; }
+  nav .links a.on { color: #F2F2F4; }
+  .nav-right { margin-left: auto; display: flex; gap: 20px; align-items: center; }
+  .nav-right .login { color: #9A9AA3; font-size: 14px; text-decoration: none; }
+  .nav-right .login:hover { color: #F2F2F4; }
+  .btn {
+    display: inline-block; padding: 9px 20px; border-radius: 8px;
+    font-size: 14px; font-weight: 600; text-decoration: none; cursor: pointer;
+    border: 1px solid transparent; transition: all .15s;
+  }
+  .btn-primary { background: #F2F2F4; color: #0B0B0D; }
+  .btn-primary:hover { background: #FFFFFF; }
+  .btn-outline { border-color: rgba(255,255,255,0.18); color: #D6D6DA; }
+  .btn-outline:hover { border-color: rgba(255,255,255,0.45); color: #FFF; }
+  .btn-blue { background: #4C8DFF; color: #fff; }
+  .btn-blue:hover { background: #639CFF; }
+
+  /* ===== Hero ===== */
+  .hero { padding: 132px 48px 96px; text-align: center; position: relative; }
+  .hero::before {
+    content: ''; position: absolute; top: -260px; left: 50%; transform: translateX(-50%);
+    width: 900px; height: 560px; z-index: -1;
+    background: radial-gradient(ellipse 50% 50% at 50% 50%, rgba(76,141,255,0.13), transparent 65%);
+  }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 13px; color: #B8B8C0; letter-spacing: 1px;
+    padding: 7px 16px; border: 1px solid rgba(255,255,255,0.1); border-radius: 999px;
+    margin-bottom: 40px;
+  }
+  .hero-tag .dot { width: 6px; height: 6px; border-radius: 50%; background: #4C8DFF; }
+  .hero h1 {
+    font-size: 88px; font-weight: 900; line-height: 1.08; letter-spacing: 2px;
+    color: #F5F5F7;
+  }
+  .hero h1 .accent { color: #4C8DFF; }
+  .hero .sub {
+    margin: 32px auto 0; max-width: 640px;
+    font-size: 17px; line-height: 1.9; color: #9A9AA3; font-weight: 400;
+  }
+  .hero-cta { display: flex; gap: 14px; justify-content: center; margin-top: 48px; }
+  .hero-cta .btn { padding: 13px 32px; font-size: 15px; }
+
+  /* ===== 数据条 ===== */
+  .metrics {
+    max-width: 880px; margin: 88px auto 0; padding-top: 44px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+    display: grid; grid-template-columns: repeat(4, 1fr);
+  }
+  .metric { text-align: center; }
+  .metric + .metric { border-left: 1px solid rgba(255,255,255,0.07); }
+  .metric .num { font-size: 30px; font-weight: 700; font-family: "SF Mono", Menlo, monospace; letter-spacing: -0.5px; }
+  .metric .label { font-size: 12.5px; color: #6E6E78; margin-top: 6px; letter-spacing: 1.5px; }
+
+  /* ===== 区块通用 ===== */
+  .section { max-width: 1120px; margin: 0 auto; padding: 88px 48px; }
+  .section-head { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 36px; }
+  .section-head h2 { font-size: 36px; font-weight: 800; letter-spacing: 1px; }
+  .section-head .note { color: #6E6E78; font-size: 13px; }
+
+  /* ===== 工具 ===== */
+  .tools { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .tool {
+    border: 1px solid rgba(255,255,255,0.08); border-radius: 12px;
+    padding: 26px 22px; background: #0F0F12;
+    transition: all .18s; cursor: pointer;
+  }
+  .tool:hover { border-color: rgba(76,141,255,0.45); background: #121218; }
+  .tool .t-index { font-size: 12px; color: #565660; font-family: "SF Mono", Menlo, monospace; }
+  .tool h3 { font-size: 16px; font-weight: 600; margin-top: 14px; letter-spacing: 0.3px; }
+  .tool p { font-size: 12.5px; color: #77777F; margin-top: 8px; line-height: 1.65; }
+  .tool .t-tag { display: inline-block; margin-top: 16px; font-size: 11.5px; color: #8FB6FF; border: 1px solid rgba(76,141,255,0.25); padding: 3px 10px; border-radius: 4px; }
+
+  /* ===== 设计清单 ===== */
+  .designs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .design {
+    border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; overflow: hidden;
+    background: #0F0F12; transition: all .18s; cursor: pointer;
+  }
+  .design:hover { border-color: rgba(255,255,255,0.22); transform: translateY(-2px); }
+  .design .d-cover { height: 108px; display: flex; align-items: center; justify-content: center; font-size: 30px; color: #565660; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .design .d-body { padding: 18px 20px 20px; }
+  .design .d-title { font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: space-between; }
+  .design .d-title .arrow { color: #565660; font-size: 13px; transition: all .15s; }
+  .design:hover .d-title .arrow { color: #4C8DFF; transform: translateX(3px); }
+  .design .d-desc { font-size: 12.5px; color: #77777F; margin-top: 8px; line-height: 1.6; }
+  .design .d-meta { display: flex; gap: 12px; margin-top: 16px; }
+  .design .d-meta span { font-size: 11.5px; color: #9A9AA3; }
+  .design .d-meta span em { font-style: normal; color: #C9C9CF; font-family: "SF Mono", Menlo, monospace; margin-left: 3px; }
+
+  /* ===== 作品 ===== */
+  .works { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .work {
+    border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; overflow: hidden;
+    background: #0F0F12; transition: all .18s; cursor: pointer;
+  }
+  .work:hover { border-color: rgba(255,255,255,0.22); }
+  .work .w-cover { height: 140px; display: flex; align-items: center; justify-content: center; font-size: 26px; color: #565660; border-bottom: 1px solid rgba(255,255,255,0.06); background: linear-gradient(180deg, #111116, #0D0D10); }
+  .work .w-body { padding: 15px 18px 17px; }
+  .work .w-row { display: flex; align-items: center; justify-content: space-between; }
+  .work .w-name { font-size: 14px; font-weight: 600; }
+  .work .w-price { font-size: 14px; font-family: "SF Mono", Menlo, monospace; color: #F2F2F4; }
+  .work .w-meta { display: flex; align-items: center; gap: 12px; margin-top: 9px; font-size: 12px; color: #6E6E78; }
+  .work .w-tag { font-size: 10.5px; padding: 2px 8px; border-radius: 4px; }
+  .w-tag.diy { border: 1px solid rgba(139,200,158,0.35); color: #9DC9AB; }
+  .w-tag.sale { border: 1px solid rgba(240,180,90,0.35); color: #E8C07E; }
+
+  footer { text-align: center; padding: 44px 24px; border-top: 1px solid rgba(255,255,255,0.06); color: #565660; font-size: 12.5px; letter-spacing: 1px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo"><span class="logo-mark">M</span>MakerHub 造物主</div>
+  <div class="links">
+    <a href="#" class="on">作品</a>
+    <a href="#">设计清单</a>
+    <a href="#">工具</a>
+    <a href="#">市场</a>
+  </div>
+  <div class="nav-right">
+    <a class="login" href="#">登录</a>
+    <a class="btn btn-primary" href="#">发布作品</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <span class="hero-tag"><span class="dot"></span>实物 VibeCoding 集合社区</span>
+  <h1 class="serif">用 AI 造物，<br><span class="accent">晒出来，买得到</span></h1>
+  <p class="sub">从发现工具、挑一个设计清单，到生成你的第一个实物——作品回到这里展示、找料、交易。造物主社区的每个作品，都始于一个想法。</p>
+  <div class="hero-cta">
+    <a class="btn btn-primary" href="#">去生成我的第一个实物</a>
+    <a class="btn btn-outline" href="#">浏览设计清单</a>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="num">128</div><div class="label">AI 设计清单</div></div>
+    <div class="metric"><div class="num">06</div><div class="label">接入工具</div></div>
+    <div class="metric"><div class="num">2,431</div><div class="label">实物作品</div></div>
+    <div class="metric"><div class="num">¥36</div><div class="label">平均造物成本</div></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-head">
+    <h2>接入的 AI 造物工具</h2>
+    <div class="note">从这里的任意工具出发，生成你的设计</div>
+  </div>
+  <div class="tools">
+    <div class="tool">
+      <div class="t-index">01</div>
+      <h3>Blueprint</h3>
+      <p>输入想法，输出原理图、零件清单、3D 外壳与组装说明</p>
+      <span class="t-tag">全流程生成</span>
+    </div>
+    <div class="tool">
+      <div class="t-index">02</div>
+      <h3>Cirkit Designer</h3>
+      <p>浏览器内电路设计与仿真，AI 选型，可导出 BOM</p>
+      <span class="t-tag">可导出 BOM</span>
+    </div>
+    <div class="tool">
+      <div class="t-index">03</div>
+      <h3>Schematik</h3>
+      <p>自然语言直接生成接线图、BOM 与固件代码</p>
+      <span class="t-tag">自然语言</span>
+    </div>
+    <div class="tool">
+      <div class="t-index">04</div>
+      <h3>Flux.ai</h3>
+      <p>项目内嵌 AI 设计助手，组件级上下文理解</p>
+      <span class="t-tag">设计助手</span>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-head">
+    <h2>可以试的 AI 设计清单</h2>
+    <div class="note">每个清单含零件表、找料链接与组装步骤</div>
+  </div>
+  <div class="designs">
+    <div class="design">
+      <div class="d-cover">▣</div>
+      <div class="d-body">
+        <div class="d-title">拍手声控灯 <span class="arrow">→</span></div>
+        <div class="d-desc">拍手点亮 30 秒。Arduino Nano + 声音传感器 + WS2812B 灯带</div>
+        <div class="d-meta"><span>难度<em>新手</em></span><span>成本<em>¥45</em></span><span>时长<em>2h</em></span></div>
+      </div>
+    </div>
+    <div class="design">
+      <div class="d-cover">◈</div>
+      <div class="d-body">
+        <div class="d-title">温湿度报警器 <span class="arrow">→</span></div>
+        <div class="d-desc">DHT11 实时监测，超阈值蜂鸣提醒。ESP32 可联网上报</div>
+        <div class="d-meta"><span>难度<em>进阶</em></span><span>成本<em>¥60</em></span><span>时长<em>3h</em></span></div>
+      </div>
+    </div>
+    <div class="design">
+      <div class="d-cover">◇</div>
+      <div class="d-body">
+        <div class="d-title">超声波避障小车 <span class="arrow">→</span></div>
+        <div class="d-desc">三路传感器自动避障，3D 打印车架，可加蓝牙遥控</div>
+        <div class="d-meta"><span>难度<em>进阶</em></span><span>成本<em>¥120</em></span><span>时长<em>1d</em></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-head">
+    <h2>社区精选作品</h2>
+    <div class="note">支持购买意向 · 卖家一键转闲鱼</div>
+  </div>
+  <div class="works">
+    <div class="work">
+      <div class="w-cover">▣</div>
+      <div class="w-body">
+        <div class="w-row"><span class="w-name">Blueprint AI 声控灯</span><span class="w-tag diy">DIY</span></div>
+        <div class="w-meta"><span>Blueprint</span><span>·</span><span>❤ 24</span><span>·</span><span>¥45 可复刻</span></div>
+      </div>
+    </div>
+    <div class="work">
+      <div class="w-cover">◈</div>
+      <div class="w-body">
+        <div class="w-row"><span class="w-name">智能温湿度计</span><span class="w-price">¥68</span></div>
+        <div class="w-meta"><span>Schematik</span><span>·</span><span class="w-tag sale">在售</span><span>·</span><span>闲鱼成交</span></div>
+      </div>
+    </div>
+    <div class="work">
+      <div class="w-cover">◇</div>
+      <div class="w-body">
+        <div class="w-row"><span class="w-name">迷你掌上游戏机</span><span class="w-price">¥99</span></div>
+        <div class="w-meta"><span>Cirkit</span><span>·</span><span class="w-tag sale">在售</span><span>·</span><span>含教程</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>MakerHub · 造物主社区 — AI 造物 · 晒出来 · 买得到</footer>
+</body>
+</html>

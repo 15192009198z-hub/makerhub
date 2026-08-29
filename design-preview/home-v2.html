@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MakerHub 视觉样板</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: #070B12;
+    color: #E2E8F0;
+    overflow-x: hidden;
+  }
+  /* ===== 深空背景 + 星云光晕 ===== */
+  .bg-fx {
+    position: fixed; inset: 0; z-index: -1; overflow: hidden;
+    background:
+      radial-gradient(ellipse 60% 40% at 20% 0%, rgba(167,139,250,0.14), transparent 60%),
+      radial-gradient(ellipse 50% 35% at 85% 15%, rgba(34,211,238,0.12), transparent 60%),
+      radial-gradient(ellipse 70% 50% at 50% 110%, rgba(34,211,238,0.08), transparent 60%),
+      linear-gradient(180deg, #070B12 0%, #0A0F1A 100%);
+  }
+  .bg-fx::after {
+    content: ''; position: absolute; inset: 0;
+    background-image: radial-gradient(rgba(148,163,184,0.12) 1px, transparent 1px);
+    background-size: 28px 28px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black, transparent 75%);
+  }
+  .nebula {
+    position: absolute; width: 700px; height: 700px; border-radius: 50%;
+    filter: blur(90px); opacity: .5; mix-blend-mode: screen;
+    animation: drift 18s ease-in-out infinite alternate;
+  }
+  .nebula.a { background: radial-gradient(circle, rgba(34,211,238,0.35), transparent 65%); top: -200px; left: -100px; }
+  .nebula.b { background: radial-gradient(circle, rgba(167,139,250,0.32), transparent 65%); top: 10%; right: -180px; animation-delay: -6s; }
+  @keyframes drift { from { transform: translate(0,0) scale(1); } to { transform: translate(60px, 40px) scale(1.12); } }
+
+  /* ===== 导航 ===== */
+  nav {
+    position: sticky; top: 0; z-index: 50;
+    display: flex; align-items: center; gap: 28px;
+    padding: 0 40px; height: 60px;
+    background: rgba(7,11,18,0.72); backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 17px; letter-spacing: .3px; }
+  .logo-badge {
+    width: 30px; height: 30px; border-radius: 8px;
+    background: linear-gradient(135deg, #22D3EE, #A78BFA);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; color: #070B12; font-weight: 900;
+    box-shadow: 0 0 18px rgba(34,211,238,0.45);
+  }
+  nav a { color: #94A3B8; text-decoration: none; font-size: 14px; transition: color .2s; }
+  nav a:hover { color: #22D3EE; }
+  .nav-right { margin-left: auto; display: flex; gap: 14px; align-items: center; }
+  .btn {
+    padding: 8px 18px; border-radius: 10px; font-size: 14px; font-weight: 600;
+    text-decoration: none; border: none; cursor: pointer; transition: all .2s;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, #22D3EE, #38BDF8);
+    color: #070B12; box-shadow: 0 0 22px rgba(34,211,238,0.35);
+  }
+  .btn-primary:hover { box-shadow: 0 0 32px rgba(34,211,238,0.6); transform: translateY(-1px); }
+  .btn-ghost { color: #CBD5E1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); }
+  .btn-ghost:hover { border-color: rgba(34,211,238,0.5); color: #22D3EE; }
+
+  /* ===== Hero ===== */
+  .hero { text-align: center; padding: 110px 40px 80px; position: relative; }
+  .hero-tag {
+    display: inline-block; padding: 6px 16px; border-radius: 999px; font-size: 13px;
+    background: rgba(167,139,250,0.1); border: 1px solid rgba(167,139,250,0.3);
+    color: #C4B5FD; margin-bottom: 26px; letter-spacing: 1px;
+  }
+  .hero h1 {
+    font-size: 64px; font-weight: 900; line-height: 1.12; letter-spacing: -1px;
+    background: linear-gradient(120deg, #F8FAFC 20%, #22D3EE 50%, #A78BFA 80%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .hero h1 .stroke { -webkit-text-stroke: 1px rgba(148,163,184,0.4); color: transparent; background: none; }
+  .hero p { margin: 22px auto 36px; max-width: 560px; color: #94A3B8; font-size: 17px; line-height: 1.8; }
+  .hero-cta { display: flex; gap: 14px; justify-content: center; }
+  .hero-cta .btn { padding: 13px 30px; font-size: 15px; border-radius: 12px; }
+  .hero-metrics { display: flex; gap: 48px; justify-content: center; margin-top: 54px; }
+  .metric .num { font-size: 30px; font-weight: 800; font-family: "SF Mono", Menlo, monospace; }
+  .metric .num em { font-style: normal; color: #22D3EE; }
+  .metric .label { font-size: 12px; color: #64748B; margin-top: 4px; letter-spacing: 1px; }
+
+  /* ===== 区块 ===== */
+  .section { max-width: 1180px; margin: 0 auto; padding: 60px 40px; }
+  .section-head { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 26px; }
+  .section-head h2 { font-size: 28px; font-weight: 800; letter-spacing: -0.3px; }
+  .section-head h2 span { background: linear-gradient(90deg, #22D3EE, #A78BFA); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .section-head .more { color: #64748B; font-size: 13px; text-decoration: none; }
+  .section-head .more:hover { color: #22D3EE; }
+
+  /* ===== 工具集合 ===== */
+  .tools { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .tool-card {
+    padding: 22px; border-radius: 16px; background: rgba(14,22,32,0.8);
+    border: 1px solid rgba(255,255,255,0.06); position: relative; overflow: hidden;
+    transition: all .25s; cursor: pointer;
+  }
+  .tool-card::before {
+    content: ''; position: absolute; inset: 0; border-radius: 16px; padding: 1px;
+    background: linear-gradient(135deg, rgba(34,211,238,0.4), rgba(167,139,250,0.4));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+    opacity: 0; transition: opacity .25s;
+  }
+  .tool-card:hover { transform: translateY(-4px); background: rgba(16,26,38,0.9); }
+  .tool-card:hover::before { opacity: 1; }
+  .tool-card .icon { font-size: 26px; margin-bottom: 12px; }
+  .tool-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .tool-card p { font-size: 12.5px; color: #64748B; line-height: 1.6; }
+  .tool-card .tag { display: inline-block; margin-top: 12px; font-size: 11px; color: #22D3EE; background: rgba(34,211,238,0.08); padding: 3px 10px; border-radius: 999px; }
+
+  /* ===== 设计清单 ===== */
+  .designs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .design-card {
+    border-radius: 16px; overflow: hidden; background: rgba(14,22,32,0.8);
+    border: 1px solid rgba(255,255,255,0.06); transition: all .25s; cursor: pointer;
+  }
+  .design-card:hover { transform: translateY(-4px); border-color: rgba(34,211,238,0.35); box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
+  .design-cover { height: 130px; display: flex; align-items: center; justify-content: center; font-size: 44px; position: relative; }
+  .design-cover.d1 { background: linear-gradient(135deg, rgba(34,211,238,0.18), rgba(14,22,32,0.2)); }
+  .design-cover.d2 { background: linear-gradient(135deg, rgba(167,139,250,0.18), rgba(14,22,32,0.2)); }
+  .design-cover.d3 { background: linear-gradient(135deg, rgba(52,211,153,0.18), rgba(14,22,32,0.2)); }
+  .design-body { padding: 16px 18px 18px; }
+  .design-body h3 { font-size: 15.5px; font-weight: 700; }
+  .design-body .desc { font-size: 12.5px; color: #64748B; margin-top: 5px; line-height: 1.55; }
+  .badges { display: flex; gap: 8px; margin-top: 12px; }
+  .badge { font-size: 11px; padding: 3px 9px; border-radius: 999px; }
+  .badge.diff { background: rgba(34,211,238,0.1); color: #67E8F9; border: 1px solid rgba(34,211,238,0.25); }
+  .badge.cost { background: rgba(245,158,11,0.1); color: #FCD34D; border: 1px solid rgba(245,158,11,0.25); }
+  .badge.time { background: rgba(167,139,250,0.1); color: #C4B5FD; border: 1px solid rgba(167,139,250,0.25); }
+
+  /* ===== 作品流 ===== */
+  .works { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .work-card {
+    border-radius: 16px; overflow: hidden; background: rgba(14,22,32,0.8);
+    border: 1px solid rgba(255,255,255,0.06); transition: all .25s; cursor: pointer;
+  }
+  .work-card:hover { transform: translateY(-4px); border-color: rgba(34,211,238,0.35); }
+  .work-cover { height: 150px; display: flex; align-items: center; justify-content: center; font-size: 40px;
+    background: linear-gradient(135deg, rgba(34,211,238,0.12), rgba(167,139,250,0.12)); }
+  .work-body { padding: 14px 16px 16px; }
+  .work-body .row { display: flex; align-items: center; gap: 8px; }
+  .work-body h3 { font-size: 14.5px; font-weight: 700; }
+  .deal-tag { font-size: 10.5px; padding: 2px 8px; border-radius: 999px; }
+  .deal-diy { background: rgba(52,211,153,0.12); color: #6EE7B7; border: 1px solid rgba(52,211,153,0.3); }
+  .deal-sell { background: rgba(245,158,11,0.12); color: #FCD34D; border: 1px solid rgba(245,158,11,0.3); }
+  .work-body .meta { display: flex; justify-content: space-between; margin-top: 10px; font-size: 12px; color: #64748B; }
+  .work-body .price { font-family: "SF Mono", Menlo, monospace; color: #FCD34D; font-size: 13px; font-weight: 700; }
+
+  footer { text-align: center; padding: 40px; color: #475569; font-size: 12.5px; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 40px; }
+</style>
+</head>
+<body>
+<div class="bg-fx"><div class="nebula a"></div><div class="nebula b"></div></div>
+
+<nav>
+  <div class="logo"><span class="logo-badge">M</span>MakerHub<span style="color:#64748B;font-weight:500;font-size:13px;">造物主社区</span></div>
+  <a href="#">作品</a>
+  <a href="#">设计清单</a>
+  <a href="#">工具</a>
+  <a href="#">市场</a>
+  <div class="nav-right">
+    <a href="#" style="color:#94A3B8;">登录</a>
+    <a class="btn btn-primary" href="#">发布作品</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <span class="hero-tag">⚡ 实物 VibeCoding 集合社区</span>
+  <h1>用 AI 造物，<br>晒出来，<span class="stroke">买得到</span></h1>
+  <p>从这里出发——发现 Blueprint / Cirkit / Schematik 等 AI 硬件工具，挑一个设计清单，生成你的第一个实物。作品回到这里展示、找料、交易。</p>
+  <div class="hero-cta">
+    <a class="btn btn-primary" href="#">🚀 去生成我的第一个实物</a>
+    <a class="btn btn-ghost" href="#">浏览设计清单</a>
+  </div>
+  <div class="hero-metrics">
+    <div class="metric"><div class="num"><em>128</em></div><div class="label">AI 设计清单</div></div>
+    <div class="metric"><div class="num"><em>6</em></div><div class="label">接入工具</div></div>
+    <div class="metric"><div class="num"><em>2,431</em></div><div class="label">实物作品</div></div>
+    <div class="metric"><div class="num"><em>¥36</em></div><div class="label">平均造物成本</div></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-head"><h2>接入的 <span>AI 造物工具</span></h2><a class="more" href="#">全部工具 →</a></div>
+  <div class="tools">
+    <div class="tool-card"><div class="icon">🧠</div><h3>Blueprint</h3><p>输入想法，生成原理图 + BOM + 3D 外壳 + 组装说明</p><span class="tag">全流程生成</span></div>
+    <div class="tool-card"><div class="icon">🔌</div><h3>Cirkit Designer</h3><p>浏览器内电路设计 + 仿真，AI 选型，可导出 BOM</p><span class="tag">可导出 BOM</span></div>
+    <div class="tool-card"><div class="icon">⚡</div><h3>Schematik</h3><p>自然语言直接生成接线图、BOM 和固件代码</p><span class="tag">自然语言</span></div>
+    <div class="tool-card"><div class="icon">🧩</div><h3>Flux.ai</h3><p>项目内嵌 AI 设计助手，组件级上下文理解</p><span class="tag">设计助手</span></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-head"><h2>可以试的 <span>AI 设计清单</span></h2><a class="more" href="#">全部清单 →</a></div>
+  <div class="designs">
+    <div class="design-card">
+      <div class="design-cover d1">💡</div>
+      <div class="design-body">
+        <h3>拍手声控灯</h3>
+        <div class="desc">拍手点亮 30 秒，Arduino Nano + 声音传感器 + WS2812B 灯带</div>
+        <div class="badges"><span class="badge diff">新手</span><span class="badge cost">约 ¥45</span><span class="badge time">2 小时</span></div>
+      </div>
+    </div>
+    <div class="design-card">
+      <div class="design-cover d2">🌡️</div>
+      <div class="design-body">
+        <h3>温湿度报警器</h3>
+        <div class="desc">DHT11 实时监测，超阈值蜂鸣 + 手机提醒，ESP32 联网</div>
+        <div class="badges"><span class="badge diff">进阶</span><span class="badge cost">约 ¥60</span><span class="badge time">3 小时</span></div>
+      </div>
+    </div>
+    <div class="design-card">
+      <div class="design-cover d3">🤖</div>
+      <div class="design-body">
+        <h3>超声波避障小车</h3>
+        <div class="desc">三路传感器自动避障，3D 打印车架，蓝牙遥控可加装</div>
+        <div class="badges"><span class="badge diff">大佬</span><span class="badge cost">约 ¥120</span><span class="badge time">1 天</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-head"><h2>社区 <span>精选作品</span></h2><a class="more" href="#">全部作品 →</a></div>
+  <div class="works">
+    <div class="work-card">
+      <div class="work-cover">💡</div>
+      <div class="work-body">
+        <div class="row"><h3>Blueprint AI 声控灯</h3><span class="deal-tag deal-diy">DIY</span></div>
+        <div class="meta"><span>🧠 Blueprint</span><span>❤️ 24</span></div>
+      </div>
+    </div>
+    <div class="work-card">
+      <div class="work-cover">🌡️</div>
+      <div class="work-body">
+        <div class="row"><h3>智能温湿度计</h3><span class="deal-tag deal-sell">在售</span></div>
+        <div class="meta"><span>⚡ Schematik</span><span class="price">¥68</span></div>
+      </div>
+    </div>
+    <div class="work-card">
+      <div class="work-cover">🎮</div>
+      <div class="work-body">
+        <div class="row"><h3>迷你游戏机</h3><span class="deal-tag deal-sell">在售</span></div>
+        <div class="meta"><span>🔌 Cirkit</span><span class="price">¥99</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>MakerHub · 造物主社区 —— AI 造物 · 晒出来 · 买得到</footer>
+</body>
+</html>
