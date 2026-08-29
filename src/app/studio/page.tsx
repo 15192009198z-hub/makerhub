@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import PartLinks from "@/components/PartLinks";
+import WiringDiagram from "@/components/WiringDiagram";
 import { buildPartLinks } from "@/lib/parts";
 import { TOOLS } from "@/lib/catalog";
 
@@ -16,6 +17,7 @@ interface StudioResult {
   title: string;
   bom: BomItem[];
   wiring: string;
+  connections: { a: string; b: string; note: string }[];
   steps: string[];
   notes: string[];
 }
@@ -27,13 +29,38 @@ const EXAMPLES = [
   "养植物的自动浇水器",
 ];
 
+const PHASES = [
+  "AI 正在理解你的想法",
+  "正在选型零件",
+  "正在生成接线方案",
+  "正在整理组装步骤",
+];
+
 export default function StudioPage() {
   const router = useRouter();
   const [idea, setIdea] = useState("");
   const [busy, setBusy] = useState(false);
+  const [phase, setPhase] = useState(0);
   const [msg, setMsg] = useState("");
   const [result, setResult] = useState<StudioResult | null>(null);
+  const [tab, setTab] = useState<"parts" | "wiring" | "steps">("parts");
   const [publishing, setPublishing] = useState(false);
+  const phaseTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // 生成中的阶段推进动画
+  useEffect(() => {
+    if (busy) {
+      setPhase(0);
+      phaseTimer.current = setInterval(() => {
+        setPhase((p) => Math.min(p + 1, PHASES.length - 1));
+      }, 1800);
+    } else {
+      if (phaseTimer.current) clearInterval(phaseTimer.current);
+    }
+    return () => {
+      if (phaseTimer.current) clearInterval(phaseTimer.current);
+    };
+  }, [busy]);
 
   async function generate(text?: string) {
     const ideaText = text ?? idea;
@@ -41,6 +68,7 @@ export default function StudioPage() {
     setBusy(true);
     setMsg("");
     setResult(null);
+    setTab("parts");
     try {
       const res = await fetch("/api/studio/generate", {
         method: "POST",
@@ -65,12 +93,15 @@ export default function StudioPage() {
       const bomText = result.bom
         .map((b) => `${b.name} ×${b.qty}${b.note ? ` （${b.note}）` : ""}`)
         .join("\n");
+      const connText = result.connections
+        .map((c) => `${c.a} — ${c.b}（${c.note}）`)
+        .join("；");
       const res = await fetch("/api/projects", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title: result.title,
-          description: `由 MakerHub AI 造物工作室生成。\n\n🧠 想法：${idea.trim()}\n\n🔌 接线：${result.wiring}\n\n📝 步骤：${result.steps.map((s, i) => `${i + 1}. ${s}`).join(" ")}`,
+          description: `由 MakerHub AI 造物工作室生成。\n\n🧠 想法：${idea.trim()}\n\n🔌 接线：${result.wiring}${connText ? `\n连接：${connText}` : ""}\n\n📝 步骤：${result.steps.map((s, i) => `${i + 1}. ${s}`).join(" ")}`,
           tool: "MakerHub 工作室",
           imageUrl: "",
           dealTag: "DIY",
@@ -86,12 +117,18 @@ export default function StudioPage() {
     }
   }
 
+  const tabs = [
+    { id: "parts" as const, label: `零件清单 · ${result?.bom.length ?? 0}` },
+    { id: "wiring" as const, label: "接线图" },
+    { id: "steps" as const, label: "组装步骤" },
+  ];
+
   return (
-    <div className="mx-auto max-w-[860px] px-6 py-14 lg:px-8">
+    <div className="mx-auto max-w-[960px] px-6 py-14 lg:px-8">
       <div className="kicker">AI STUDIO</div>
       <h1 className="mt-3 text-4xl font-black tracking-[2px]">AI 造物工作室</h1>
-      <p className="mt-4 max-w-[620px] text-[15px] leading-[1.9] text-[#8e8e98]">
-        用一句话描述你想做的实物，AI 生成完整方案：零件清单 + 接线 +
+      <p className="mt-4 max-w-[640px] text-[15px] leading-[1.9] text-[#8e8e98]">
+        用一句话描述你想做的实物，AI 生成完整方案：零件清单 + 接线图 +
         组装步骤，直接接上国内购买链接。全程中文，不用跳转任何外站。
       </p>
 
@@ -119,18 +156,21 @@ export default function StudioPage() {
             </button>
           ))}
         </div>
-        <div className="mt-5 flex items-center gap-3">
+        <div className="mt-5 flex items-center gap-4">
           <button
             onClick={() => generate()}
             disabled={busy || !idea.trim()}
             className="btn btn-blue !px-8 !py-3 disabled:opacity-40"
           >
-            {busy ? "AI 生成中…" : "⚡ 生成造物方案"}
+            {busy ? "生成中…" : "⚡ 生成造物方案"}
           </button>
           {busy && (
-            <span className="mono animate-pulse text-[12px] text-[#5e5e68]">
-              正在设计电路…
-            </span>
+            <div className="flex items-center gap-2.5">
+              <span className="h-1.5 w-1.5 animate-ping rounded-full bg-[#4c8dff]" />
+              <span className="mono text-[12px] tracking-[1px] text-[#7fa8ff]">
+                {PHASES[phase]}
+              </span>
+            </div>
           )}
         </div>
         {msg && <p className="mt-4 text-[13px] leading-[1.8] text-[#e8c07e]">{msg}</p>}
@@ -152,76 +192,114 @@ export default function StudioPage() {
             </button>
           </div>
 
-          {/* BOM */}
-          <div className="mt-6 overflow-hidden rounded-xl border border-[rgba(255,255,255,0.08)]">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-[rgba(255,255,255,0.08)] bg-[#0d0d10] text-left text-xs text-[#5e5e68]">
-                  <th className="px-4 py-2.5">零件</th>
-                  <th className="w-16 px-4 py-2.5">数量</th>
-                  <th className="px-4 py-2.5">备注</th>
-                  <th className="px-4 py-2.5">去哪买</th>
-                </tr>
-              </thead>
-              <tbody>
-                {result.bom.map((b, i) => (
-                  <tr key={i} className="border-b border-[rgba(255,255,255,0.05)] last:border-0">
-                    <td className="px-4 py-3 font-medium text-[#e8e8ea]">{b.name}</td>
-                    <td className="px-4 py-3 text-[#8e8e98]">{b.qty}</td>
-                    <td className="px-4 py-3 text-xs text-[#6e6e78]">{b.note}</td>
-                    <td className="px-4 py-3">
-                      <PartLinks links={buildPartLinks(b.name)} />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          {/* 分页签 */}
+          <div className="mt-6 flex gap-1 rounded-xl border border-[rgba(255,255,255,0.08)] bg-[#0f0f12] p-1.5">
+            {tabs.map((t) => (
+              <button
+                key={t.id}
+                onClick={() => setTab(t.id)}
+                className={`flex-1 rounded-lg py-2.5 text-[13px] font-semibold tracking-[1px] transition-all ${
+                  tab === t.id
+                    ? "bg-[#f2f2f4] text-[#0a0a0c]"
+                    : "text-[#8e8e98] hover:text-[#f0f0f2]"
+                }`}
+              >
+                {t.label}
+              </button>
+            ))}
           </div>
 
-          {/* 接线 */}
-          {result.wiring && (
-            <div className="mt-6 rounded-xl border border-[rgba(255,255,255,0.08)] bg-[#0f0f12] p-6">
-              <h3 className="text-[13px] font-bold tracking-[2px] text-[#8fb6ff]">
-                🔌 接线说明
-              </h3>
-              <p className="mt-3 text-[14px] leading-[1.9] text-[#c8c8ce]">
-                {result.wiring}
-              </p>
+          {/* 零件清单 */}
+          {tab === "parts" && (
+            <div className="mt-5 flex flex-col gap-3">
+              {result.bom.map((b, i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-4 rounded-xl border border-[rgba(255,255,255,0.08)] bg-[#0f0f12] px-5 py-4 transition-colors hover:border-[rgba(76,141,255,0.35)]"
+                >
+                  <div className="mono flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[rgba(76,141,255,0.3)] text-[12px] text-[#7fa8ff]">
+                    {String(i + 1).padStart(2, "0")}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-[14.5px] font-semibold">
+                      {b.name}
+                    </div>
+                    {b.note && (
+                      <div className="mt-0.5 text-[12px] text-[#6e6e78]">
+                        {b.note}
+                      </div>
+                    )}
+                  </div>
+                  <div className="mono shrink-0 text-[13px] text-[#c8c8ce]">
+                    ×{b.qty}
+                  </div>
+                  <div className="shrink-0">
+                    <PartLinks links={buildPartLinks(b.name)} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* 接线图 */}
+          {tab === "wiring" && (
+            <div className="mt-5 flex flex-col gap-4">
+              {result.connections.length > 0 ? (
+                <WiringDiagram connections={result.connections} />
+              ) : (
+                <p className="text-[13px] text-[#5e5e68]">暂无连接数据</p>
+              )}
+              {result.wiring && (
+                <div className="rounded-xl border border-[rgba(255,255,255,0.08)] bg-[#0f0f12] p-6">
+                  <h3 className="text-[13px] font-bold tracking-[2px] text-[#8fb6ff]">
+                    🔌 接线说明
+                  </h3>
+                  <p className="mt-3 text-[14px] leading-[1.9] text-[#c8c8ce]">
+                    {result.wiring}
+                  </p>
+                </div>
+              )}
             </div>
           )}
 
           {/* 步骤 */}
-          {result.steps.length > 0 && (
-            <div className="mt-6 rounded-xl border border-[rgba(255,255,255,0.08)] bg-[#0f0f12] p-6">
-              <h3 className="text-[13px] font-bold tracking-[2px] text-[#8fb6ff]">
-                🛠️ 组装步骤
-              </h3>
-              <ol className="mt-3 flex flex-col gap-2.5">
-                {result.steps.map((s, i) => (
-                  <li key={i} className="flex items-start gap-3 text-[14px] leading-[1.8] text-[#c8c8ce]">
-                    <span className="mono mt-0.5 text-[12px] text-[#4c8dff]">
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    {s}
-                  </li>
-                ))}
-              </ol>
-            </div>
-          )}
-
-          {/* 注意事项 */}
-          {result.notes.length > 0 && (
-            <div className="mt-6 rounded-xl border border-[rgba(245,170,90,0.2)] bg-[rgba(245,158,11,0.04)] p-6">
-              <h3 className="text-[13px] font-bold tracking-[2px] text-[#e8c07e]">
-                ⚠️ 注意事项
-              </h3>
-              <ul className="mt-3 flex flex-col gap-2">
-                {result.notes.map((n, i) => (
-                  <li key={i} className="text-[13.5px] leading-[1.8] text-[#c8b89a]">
-                    · {n}
-                  </li>
-                ))}
-              </ul>
+          {tab === "steps" && (
+            <div className="mt-5 flex flex-col gap-4">
+              <div className="rounded-xl border border-[rgba(255,255,255,0.08)] bg-[#0f0f12] p-6">
+                <h3 className="text-[13px] font-bold tracking-[2px] text-[#8fb6ff]">
+                  🛠️ 组装步骤
+                </h3>
+                <ol className="mt-4 flex flex-col gap-3">
+                  {result.steps.map((s, i) => (
+                    <li
+                      key={i}
+                      className="flex items-start gap-3 text-[14px] leading-[1.8] text-[#c8c8ce]"
+                    >
+                      <span className="mono mt-0.5 text-[12px] text-[#4c8dff]">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      {s}
+                    </li>
+                  ))}
+                </ol>
+              </div>
+              {result.notes.length > 0 && (
+                <div className="rounded-xl border border-[rgba(245,170,90,0.2)] bg-[rgba(245,158,11,0.04)] p-6">
+                  <h3 className="text-[13px] font-bold tracking-[2px] text-[#e8c07e]">
+                    ⚠️ 注意事项
+                  </h3>
+                  <ul className="mt-3 flex flex-col gap-2">
+                    {result.notes.map((n, i) => (
+                      <li
+                        key={i}
+                        className="text-[13.5px] leading-[1.8] text-[#c8b89a]"
+                      >
+                        · {n}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -252,7 +330,8 @@ export default function StudioPage() {
             >
               <div className="mono text-[10.5px] text-[#4a4a54]">{t.index}</div>
               <h3 className="mt-2 text-[15px] font-semibold tracking-[1px]">
-                {t.name} <span className="ml-1 text-[12px] text-[#565660]">↗</span>
+                {t.name}{" "}
+                <span className="ml-1 text-[12px] text-[#565660]">↗</span>
               </h3>
               <p className="mt-1.5 text-[12px] leading-[1.7] text-[#6e6e78]">
                 {t.desc}

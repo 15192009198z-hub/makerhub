@@ -7,6 +7,7 @@ interface StudioResult {
   title: string;
   bom: { name: string; qty: string; note: string }[];
   wiring: string;
+  connections: { a: string; b: string; note: string }[];
   steps: string[];
   notes: string[];
 }
@@ -18,6 +19,7 @@ const SYSTEM_PROMPT = `你是资深硬件创客助手。用户会用中文描述
   "title": "作品名称（中文，简洁）",
   "bom": [{"name": "零件名称（含型号规格，如 Arduino Nano V3.0、KY-038 麦克风模块）", "qty": "数量", "note": "用途或规格说明"}],
   "wiring": "接线说明（2-4 句话，讲清楚关键连接）",
+  "connections": [{"a": "零件A名称", "b": "零件B名称", "note": "连接方式，如 A0 引脚 或 VCC-GND-信号"}],
   "steps": ["组装步骤1", "步骤2", "步骤3", "步骤4"],
   "notes": ["注意事项1", "注意事项2"]
 }
@@ -25,6 +27,7 @@ const SYSTEM_PROMPT = `你是资深硬件创客助手。用户会用中文描述
 要求：
 - 零件优先选国内容易买到的常见模块（Arduino/ESP32、传感器模块、面包板、杜邦线等）
 - bom 至少 3 个零件，最多 8 个
+- connections 列出关键电气连接 4-8 条，a/b 用 bom 中的零件名称，note 说明引脚或信号
 - 步骤 3-5 条，具体可执行
 - 全部用简体中文`;
 
@@ -85,6 +88,16 @@ export async function POST(req: Request) {
             .slice(0, 12)
         : [],
       wiring: String(parsed.wiring || "").slice(0, 600),
+      connections: Array.isArray(parsed.connections)
+        ? parsed.connections
+            .map((c) => ({
+              a: String(c.a || "").trim(),
+              b: String(c.b || "").trim(),
+              note: String(c.note || "").trim().slice(0, 60),
+            }))
+            .filter((c) => c.a && c.b)
+            .slice(0, 10)
+        : [],
       steps: Array.isArray(parsed.steps)
         ? parsed.steps.map((s) => String(s).trim()).filter(Boolean).slice(0, 6)
         : [],
