@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+html {
+  scrollbar-color: #1e2a36 #0a0f14;
+}
+
+body {
+  font-family:
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    "PingFang SC",
+    "Hiragino Sans GB",
+    "Microsoft YaHei",
+    sans-serif;
+}
+
+::selection {
+  background: rgba(34, 211, 238, 0.3);
+}
