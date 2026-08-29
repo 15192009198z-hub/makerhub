@@ -4,7 +4,9 @@
 
 GitHub 上大家发代码仓库，MakerHub 上大家发实物作品——用 **Blueprint / Cirkit Designer / Schematik** 这些 AI 工具设计出来的硬件，晒出来，买得到。
 
-> 本项目本身就是一个 vibecoding 产物：全站代码由 AI 生成。
+> 🌐 线上地址：**https://makerhub-eight.vercel.app**
+>
+> 本项目本身就是一个 vibecoding 产物：全站代码由 AI 生成，从想法到上线不到一天。
 
 ## ✨ 核心功能
 
