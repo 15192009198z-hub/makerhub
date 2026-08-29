@@ -91,3 +91,107 @@ body {
   color: var(--txt-faint);
   letter-spacing: 5px;
 }
+
+/* ===== 造物立方塔（动态 DOM，必须全局样式） ===== */
+.builder-box {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: clamp(340px, 38vw, 520px);
+  height: clamp(340px, 38vw, 520px);
+  z-index: 1;
+}
+.builder-box .glow {
+  position: absolute;
+  inset: 14%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(76, 141, 255, 0.14), transparent 65%);
+  pointer-events: none;
+  opacity: 0.3;
+  transition: opacity 0.8s ease;
+}
+.builder-box .glow.strong {
+  opacity: 1;
+}
+.tower-stage {
+  position: absolute;
+  inset: 0;
+  perspective: 1300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.tower {
+  position: relative;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+  transform: rotateX(-30deg) rotateY(42deg);
+  transition: transform 2s ease;
+}
+.cell {
+  position: absolute;
+  width: 52px;
+  height: 52px;
+  margin: -26px 0 0 -26px;
+  transform-style: preserve-3d;
+  transition:
+    transform 1.1s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.5s ease;
+}
+.cell .f {
+  position: absolute;
+  inset: 0;
+  border: 1.4px solid rgba(76, 141, 255, 0.42);
+  background: rgba(16, 26, 40, 0.45);
+}
+.cell .f.f1 { transform: translateZ(26px); }
+.cell .f.f2 { transform: rotateX(90deg) translateZ(26px); }
+.cell .f.f3 { transform: rotateY(90deg) translateZ(26px); }
+.cell .f.f4 { transform: rotateY(-90deg) translateZ(26px); }
+.cell .f.f5 { transform: rotateX(-90deg) translateZ(26px); }
+.cell .f.f6 { transform: rotateY(180deg) translateZ(26px); }
+.cell .f.f4,
+.cell .f.f5,
+.cell .f.f6 {
+  background: rgba(16, 26, 40, 0.22);
+  border-color: rgba(76, 141, 255, 0.24);
+}
+.cell.core .f {
+  border-color: rgba(130, 185, 255, 0.95);
+  background: rgba(76, 141, 255, 0.2);
+}
+.cell.core .dot {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #7fb4ff;
+  box-shadow: 0 0 14px 4px rgba(76, 141, 255, 0.8);
+}
+.cell.mod .f {
+  border-color: rgba(245, 170, 90, 0.6);
+  background: rgba(245, 158, 11, 0.08);
+}
+
+/* ===== 造物旅程：逐字动画 ===== */
+.scene-idea .big .ch {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(24px) rotate(3deg);
+  transition: all 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.scene-idea.active .big .ch {
+  opacity: 1;
+  transform: none;
+}
+@keyframes haloPulse {
+  0%, 100% { transform: scale(0.85); opacity: 0.5; }
+  50% { transform: scale(1.1); opacity: 1; }
+}
+@keyframes blink {
+  50% { opacity: 0; }
+}

@@ -108,75 +108,15 @@ export default function CubeTower() {
   }, []);
 
   return (
-    <div className="builder-box relative z-10 hidden md:block">
-      <div className="glow absolute inset-[14%] rounded-full bg-[radial-gradient(circle,rgba(76,141,255,0.14),transparent_65%)] opacity-30 transition-opacity duration-800" />
-      <div className="absolute inset-0 flex items-center justify-center [perspective:1300px]">
+    <div className="builder-box hidden md:block">
+      <div className="glow" />
+      <div className="tower-stage">
         <div
           ref={ref}
-          className="relative h-0 w-0 [transform-style:preserve-3d]"
+          className="tower"
           style={{ transform: "rotateX(-30deg) rotateY(42deg)" }}
         />
       </div>
-      <style jsx>{`
-        .cell {
-          position: absolute;
-          width: 52px;
-          height: 52px;
-          margin: -26px 0 0 -26px;
-          transform-style: preserve-3d;
-          transition:
-            transform 1.1s cubic-bezier(0.22, 1, 0.36, 1),
-            opacity 0.5s ease;
-        }
-        .cell .f {
-          position: absolute;
-          inset: 0;
-          border: 1.4px solid rgba(76, 141, 255, 0.42);
-          background: rgba(16, 26, 40, 0.45);
-        }
-        .cell .f.f1 {
-          transform: translateZ(26px);
-        }
-        .cell .f.f2 {
-          transform: rotateX(90deg) translateZ(26px);
-        }
-        .cell .f.f3 {
-          transform: rotateY(90deg) translateZ(26px);
-        }
-        .cell .f.f4 {
-          transform: rotateY(-90deg) translateZ(26px);
-        }
-        .cell .f.f5 {
-          transform: rotateX(-90deg) translateZ(26px);
-        }
-        .cell .f.f6 {
-          transform: rotateY(180deg) translateZ(26px);
-        }
-        .cell .f.f4,
-        .cell .f.f5,
-        .cell .f.f6 {
-          background: rgba(16, 26, 40, 0.22);
-          border-color: rgba(76, 141, 255, 0.24);
-        }
-        .cell.core .f {
-          border-color: rgba(130, 185, 255, 0.95);
-          background: rgba(76, 141, 255, 0.2);
-        }
-        .cell.core .dot {
-          position: absolute;
-          inset: 0;
-          margin: auto;
-          width: 9px;
-          height: 9px;
-          border-radius: 50%;
-          background: #7fb4ff;
-          box-shadow: 0 0 14px 4px rgba(76, 141, 255, 0.8);
-        }
-        .cell.mod .f {
-          border-color: rgba(245, 170, 90, 0.6);
-          background: rgba(245, 158, 11, 0.08);
-        }
-      `}</style>
     </div>
   );
 }

@@ -43,23 +43,6 @@ export default async function Home() {
               浏览设计清单
             </Link>
           </div>
-          <div className="mt-16 grid max-w-[880px] grid-cols-4 border-t border-[rgba(255,255,255,0.07)] pt-11">
-            {[
-              ["128", "AI 设计清单"],
-              ["06", "接入工具"],
-              ["2,431", "实物作品"],
-              ["¥36", "平均造物成本"],
-            ].map(([num, label]) => (
-              <div key={label} className="text-center">
-                <div className="mono text-3xl font-bold tracking-[-0.5px]">
-                  {num}
-                </div>
-                <div className="mt-1.5 text-[12.5px] tracking-[1.5px] text-[#6e6e78]">
-                  {label}
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
         <CubeTower />
       </section>
