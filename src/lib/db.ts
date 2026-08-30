@@ -146,6 +146,11 @@ export async function initDb(): Promise<void> {
   } catch {
     // 列已存在
   }
+  try {
+    await db.execute("ALTER TABLE collection_items ADD COLUMN image_url TEXT DEFAULT ''");
+  } catch {
+    // 列已存在
+  }
   initialized = true;
 }
 
@@ -619,6 +624,7 @@ export interface CollectionRow {
   difficulty: string;
   type: string;
   url: string;
+  image_url: string;
   created_at: string;
 }
 
@@ -634,6 +640,7 @@ function mapCollection(r: Record<string, unknown>): CollectionRow {
     difficulty: (r.difficulty as string) || "新手",
     type: (r.type as string) || "其他",
     url: (r.url as string) || "",
+    image_url: (r.image_url as string) || "",
     created_at: (r.created_at as string) || "",
   };
 }
@@ -742,4 +749,28 @@ export async function favoriteIds(
     args: [userId, itemType],
   });
   return res.rows.map((r) => Number(r.item_id));
+}
+
+export async function updateCollectionImage(
+  id: number,
+  imageUrl: string
+): Promise<void> {
+  await initDb();
+  await db.execute({
+    sql: "UPDATE collection_items SET image_url = ? WHERE id = ?",
+    args: [imageUrl.slice(0, 2000), id],
+  });
+}
+
+export async function listCollectionNoImage(
+  limit = 30
+): Promise<CollectionRow[]> {
+  await initDb();
+  const res = await db.execute({
+    sql: "SELECT * FROM collection_items WHERE image_url = '' ORDER BY id DESC LIMIT ?",
+    args: [limit],
+  });
+  return res.rows.map((r) =>
+    mapCollection(r as unknown as Record<string, unknown>)
+  );
 }
