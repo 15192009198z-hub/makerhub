@@ -6,6 +6,8 @@ import {
   listProductsByUser,
   listOrdersForSeller,
   listOrdersForBuyer,
+  listCollection,
+  favoriteIds,
 } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import ProjectCard from "@/components/ProjectCard";
@@ -33,6 +35,16 @@ export default async function UserPage({
     isMe ? listOrdersForSeller(user.id) : Promise.resolve([]),
     isMe ? listOrdersForBuyer(user.id) : Promise.resolve([]),
   ]);
+
+  // 我的收藏（集合项）
+  let myFavs: Awaited<ReturnType<typeof listCollection>> = [];
+  if (isMe) {
+    const favIds = await favoriteIds(user.id, "collection");
+    if (favIds.length > 0) {
+      const all = await listCollection(200);
+      myFavs = all.filter((c) => favIds.includes(c.id));
+    }
+  }
 
   return (
     <div className="mx-auto max-w-[960px] px-6 py-14 lg:px-8">
@@ -123,6 +135,38 @@ export default async function UserPage({
           </div>
         )}
       </section>
+
+      {/* 我的收藏 */}
+      {isMe && myFavs.length > 0 && (
+        <section className="mt-12">
+          <h2 className="mb-6 text-xl font-bold tracking-[2px]">我的收藏</h2>
+          <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
+            {myFavs.map((c) => (
+              <a
+                key={c.id}
+                href={c.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="card block overflow-hidden"
+              >
+                <div className="flex h-[80px] items-center justify-center border-b border-[rgba(255,255,255,0.06)]">
+                  <span className="mono text-[10.5px] tracking-[4px] text-[#4a4a54]">
+                    {String(c.type).toUpperCase()}
+                  </span>
+                </div>
+                <div className="p-4">
+                  <div className="truncate text-[14px] font-semibold">
+                    {c.title_zh || c.title_en}
+                  </div>
+                  <div className="mt-1.5 line-clamp-2 text-[12px] leading-[1.7] text-[#6e6e78]">
+                    {c.desc_zh || c.desc_en}
+                  </div>
+                </div>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* 我的意向单 */}
       {isMe && (

@@ -101,6 +101,32 @@ export async function initDb(): Promise<void> {
     )
   `);
   await db.execute(`
+    CREATE TABLE IF NOT EXISTS collection_items (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      source TEXT NOT NULL,
+      source_id TEXT NOT NULL,
+      title_en TEXT DEFAULT '',
+      desc_en TEXT DEFAULT '',
+      title_zh TEXT DEFAULT '',
+      desc_zh TEXT DEFAULT '',
+      difficulty TEXT DEFAULT '新手',
+      type TEXT DEFAULT '其他',
+      url TEXT DEFAULT '',
+      created_at TEXT DEFAULT (datetime('now')),
+      UNIQUE(source, source_id)
+    )
+  `);
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS favorites (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      item_id INTEGER NOT NULL,
+      item_type TEXT NOT NULL,
+      created_at TEXT DEFAULT (datetime('now')),
+      UNIQUE(user_id, item_id, item_type)
+    )
+  `);
+  await db.execute(`
     CREATE TABLE IF NOT EXISTS orders (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       product_id INTEGER NOT NULL,
@@ -568,4 +594,142 @@ export async function getAdminStats(): Promise<{
     orders: Number(orders.rows[0].c),
     recent,
   };
+}
+
+// ---- 聚合集合 ----
+
+export interface CollectionRow {
+  id: number;
+  source: string;
+  source_id: string;
+  title_en: string;
+  desc_en: string;
+  title_zh: string;
+  desc_zh: string;
+  difficulty: string;
+  type: string;
+  url: string;
+  created_at: string;
+}
+
+function mapCollection(r: Record<string, unknown>): CollectionRow {
+  return {
+    id: Number(r.id),
+    source: (r.source as string) || "",
+    source_id: (r.source_id as string) || "",
+    title_en: (r.title_en as string) || "",
+    desc_en: (r.desc_en as string) || "",
+    title_zh: (r.title_zh as string) || "",
+    desc_zh: (r.desc_zh as string) || "",
+    difficulty: (r.difficulty as string) || "新手",
+    type: (r.type as string) || "其他",
+    url: (r.url as string) || "",
+    created_at: (r.created_at as string) || "",
+  };
+}
+
+export async function listCollection(limit = 100): Promise<CollectionRow[]> {
+  await initDb();
+  const res = await db.execute({
+    sql: "SELECT * FROM collection_items ORDER BY created_at DESC LIMIT ?",
+    args: [limit],
+  });
+  return res.rows.map((r) =>
+    mapCollection(r as unknown as Record<string, unknown>)
+  );
+}
+
+export async function collectionExists(
+  source: string,
+  sourceId: string
+): Promise<boolean> {
+  await initDb();
+  const res = await db.execute({
+    sql: "SELECT 1 FROM collection_items WHERE source = ? AND source_id = ?",
+    args: [source, sourceId],
+  });
+  return res.rows.length > 0;
+}
+
+export async function insertCollection(input: {
+  source: string;
+  sourceId: string;
+  titleEn: string;
+  descEn: string;
+  titleZh: string;
+  descZh: string;
+  difficulty: string;
+  type: string;
+  url: string;
+}): Promise<void> {
+  await initDb();
+  await db.execute({
+    sql: `INSERT INTO collection_items
+          (source, source_id, title_en, desc_en, title_zh, desc_zh, difficulty, type, url)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    args: [
+      input.source,
+      input.sourceId,
+      input.titleEn.slice(0, 200),
+      input.descEn.slice(0, 2000),
+      input.titleZh.slice(0, 200),
+      input.descZh.slice(0, 2000),
+      input.difficulty,
+      input.type,
+      input.url.slice(0, 500),
+    ],
+  });
+}
+
+// ---- 收藏 ----
+
+export async function addFavorite(
+  userId: number,
+  itemId: number,
+  itemType: string
+): Promise<void> {
+  await initDb();
+  await db.execute({
+    sql: "INSERT OR IGNORE INTO favorites (user_id, item_id, item_type) VALUES (?, ?, ?)",
+    args: [userId, itemId, itemType],
+  });
+}
+
+export async function removeFavorite(
+  userId: number,
+  itemId: number,
+  itemType: string
+): Promise<void> {
+  await initDb();
+  await db.execute({
+    sql: "DELETE FROM favorites WHERE user_id = ? AND item_id = ? AND item_type = ?",
+    args: [userId, itemId, itemType],
+  });
+}
+
+export async function listFavorites(userId: number): Promise<
+  { itemId: number; itemType: string; createdAt: string }[]
+> {
+  await initDb();
+  const res = await db.execute({
+    sql: "SELECT item_id, item_type, created_at FROM favorites WHERE user_id = ? ORDER BY created_at DESC",
+    args: [userId],
+  });
+  return res.rows.map((r) => ({
+    itemId: Number(r.item_id),
+    itemType: r.item_type as string,
+    createdAt: (r.created_at as string) || "",
+  }));
+}
+
+export async function favoriteIds(
+  userId: number,
+  itemType: string
+): Promise<number[]> {
+  await initDb();
+  const res = await db.execute({
+    sql: "SELECT item_id FROM favorites WHERE user_id = ? AND item_type = ?",
+    args: [userId, itemType],
+  });
+  return res.rows.map((r) => Number(r.item_id));
 }
