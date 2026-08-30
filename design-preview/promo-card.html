@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1080px; height: 1350px;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: #0a0a0c; color: #e8e8ea;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden; position: relative;
+  }
+  .serif { font-family: "Songti SC", "Noto Serif SC", "STSong", serif; }
+  .mono { font-family: "SF Mono", Menlo, monospace; }
+
+  /* 背景光晕 + 网格 */
+  .bg { position: absolute; inset: 0; }
+  .bg .glow1 { position: absolute; top: -200px; left: -100px; width: 700px; height: 700px; border-radius: 50%; background: radial-gradient(circle, rgba(76,141,255,0.16), transparent 65%); }
+  .bg .glow2 { position: absolute; bottom: -180px; right: -120px; width: 600px; height: 600px; border-radius: 50%; background: radial-gradient(circle, rgba(167,139,250,0.1), transparent 65%); }
+  .bg .grid { position: absolute; inset: 0; opacity: .3; background-image: radial-gradient(rgba(148,163,184,0.14) 1px, transparent 1px); background-size: 30px 30px; }
+
+  .inner { position: relative; padding: 90px 80px 70px; height: 100%; display: flex; flex-direction: column; }
+
+  /* Logo */
+  .logo-row { display: flex; align-items: center; gap: 20px; }
+  .logo-name { font-size: 30px; font-weight: 800; letter-spacing: 6px; color: #f0f0f2; }
+  .logo-sub { font-size: 14px; letter-spacing: 8px; color: #5e5e68; margin-top: 4px; }
+
+  /* 主标题 */
+  .hero { margin-top: 120px; }
+  .hero .tag {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: 16px; letter-spacing: 4px; color: #8e8e98;
+    border: 1px solid rgba(255,255,255,0.12); border-radius: 999px;
+    padding: 10px 26px;
+  }
+  .hero .tag .dot { width: 8px; height: 8px; border-radius: 50%; background: #4c8dff; }
+  .hero h1 {
+    margin-top: 40px; font-size: 76px; font-weight: 900; letter-spacing: 6px; line-height: 1.25;
+    color: #f4f4f6;
+  }
+  .hero h1 .accent { color: #4c8dff; }
+  .hero .sub { margin-top: 30px; font-size: 24px; line-height: 1.8; color: #8e8e98; letter-spacing: 2px; }
+
+  /* 亮点 */
+  .features { margin-top: 90px; display: flex; flex-direction: column; gap: 26px; }
+  .feat { display: flex; align-items: center; gap: 28px; padding: 24px 30px; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; background: rgba(15,15,18,0.8); }
+  .feat .ic { font-size: 30px; width: 52px; text-align: center; }
+  .feat .t { font-size: 25px; font-weight: 700; letter-spacing: 2px; }
+  .feat .d { font-size: 17px; color: #6e6e78; margin-top: 5px; letter-spacing: 1px; }
+
+  /* 链接 */
+  .links { margin-top: auto; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 34px; }
+  .links .l { font-size: 20px; letter-spacing: 1px; color: #7fa8ff; margin-top: 12px; font-family: "SF Mono", Menlo, monospace; }
+  .links .l span { color: #5e5e68; font-family: inherit; }
+  .foot { margin-top: 28px; font-size: 15px; letter-spacing: 2px; color: #4a4a54; }
+</style>
+</head>
+<body>
+  <div class="bg"><div class="glow1"></div><div class="glow2"></div><div class="grid"></div></div>
+  <div class="inner">
+    <div class="logo-row">
+      <svg width="72" height="72" viewBox="0 0 34 34" fill="none">
+        <rect x="1" y="1" width="32" height="32" rx="7" stroke="rgba(255,255,255,0.14)"/>
+        <path d="M9 25 V11 H13.5 L17 17 L20.5 11 H25 V25" stroke="#F0F0F2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="9" cy="9" r="2.6" fill="#4C8DFF"/>
+        <circle cx="9" cy="9" r="5" fill="rgba(76,141,255,0.25)"/>
+      </svg>
+      <span>
+        <span class="logo-name" style="display:block;">MakerHub</span>
+        <span class="logo-sub" style="display:block;">造物主社区</span>
+      </span>
+    </div>
+
+    <div class="hero">
+      <span class="tag"><span class="dot"></span>全球 AI 硬件作品 · 中文聚合</span>
+      <h1 class="serif">逛遍<span class="accent">全球造物</span><br>收藏 · 买到手</h1>
+      <div class="sub">看不懂英文也能逛的硬件作品社区<br>一个人 + AI 从零到上线</div>
+    </div>
+
+    <div class="features">
+      <div class="feat"><span class="ic">🌐</span><div><div class="t">作品集合</div><div class="d">全球 AI 硬件作品，自动聚合 · 中文翻译</div></div></div>
+      <div class="feat"><span class="ic">⭐</span><div><div class="t">收藏心动</div><div class="d">开发板 · 机器人 · 无人机 · 键盘</div></div></div>
+      <div class="feat"><span class="ic">🛒</span><div><div class="t">市场交易</div><div class="d">成品 · 设计 · 教程，闲鱼直达</div></div></div>
+    </div>
+
+    <div class="links">
+      <div class="l">🌐 <span>网站</span>  makerhub-eight.vercel.app</div>
+      <div class="l">💻 <span>代码</span>  github.com/15192009198z-hub/makerhub</div>
+      <div class="foot">MakerHub · 造物主社区 — AI 造物 · 晒出来 · 买得到</div>
+    </div>
+  </div>
+</body>
+</html>
