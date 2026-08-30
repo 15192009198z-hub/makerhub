@@ -4,7 +4,7 @@ import HeroParticles from "@/components/HeroParticles";
 import CubeTower from "@/components/CubeTower";
 import Journey from "@/components/Journey";
 import { listProjects } from "@/lib/db";
-import { TOOLS, REAL_PROJECTS } from "@/lib/catalog";
+import { TOOLS, COLLECTION } from "@/lib/catalog";
 
 export const dynamic = "force-dynamic";
 
@@ -136,45 +136,54 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* ===== 真实案例 ===== */}
+      {/* ===== 精选作品 ===== */}
       <section className="mx-auto max-w-[1120px] px-6 pb-24 lg:px-12">
         <div className="mb-10 flex items-end justify-between">
           <div>
-            <div className="kicker">REAL PROJECTS</div>
+            <div className="kicker">FEATURED</div>
             <h2 className="mt-3 text-3xl font-extrabold tracking-[2px] lg:text-4xl">
-              真实造物案例
+              精选作品
             </h2>
+            <p className="mt-3 text-[13px] text-[#6e6e78]">
+              来自全球 AI 硬件社区的真实作品，AI 翻译成中文
+            </p>
           </div>
-          <Link href="/designs" className="text-[13px] text-[#5e5e68] hover:text-[#4c8dff]">
-            全部案例 →
+          <Link href="/explore" className="text-[13px] text-[#5e5e68] hover:text-[#4c8dff]">
+            逛全部集合 →
           </Link>
         </div>
         <div className="grid grid-cols-1 gap-3.5 md:grid-cols-3">
-          {REAL_PROJECTS.map((d) => (
-            <Link key={d.id} href={`/designs/${d.id}`} className="card flex flex-col overflow-hidden">
+          {COLLECTION.slice(0, 3).map((c) => (
+            <a
+              key={c.id}
+              href={c.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="card flex flex-col overflow-hidden"
+            >
               <div className="flex h-[96px] items-center justify-center border-b border-[rgba(255,255,255,0.06)]">
                 <span className="mono text-[11px] tracking-[4px] text-[#565660]">
-                  {d.source}
+                  {c.type.toUpperCase()}
                 </span>
               </div>
               <div className="flex flex-1 flex-col p-5">
                 <div className="flex items-center justify-between text-[15px] font-semibold">
-                  {d.title}
+                  {c.title}
                   <span className="text-[13px] text-[#565660] transition-all hover:text-[#4c8dff]">
                     →
                   </span>
                 </div>
                 <p className="mt-2 line-clamp-2 text-[12.5px] leading-[1.7] text-[#77777f]">
-                  {d.desc}
+                  {c.zh}
                 </p>
                 <div className="mt-auto flex items-center justify-between pt-4 text-[11.5px] text-[#5e5e68]">
                   <span className="mono rounded border border-[rgba(76,141,255,0.25)] px-2 py-0.5 text-[11px] not-italic text-[#8fb6ff]">
-                    {d.difficulty}
+                    {c.difficulty}
                   </span>
-                  <span>👤 {d.author}</span>
+                  <span>查看原项目 ↗</span>
                 </div>
               </div>
-            </Link>
+            </a>
           ))}
         </div>
       </section>
