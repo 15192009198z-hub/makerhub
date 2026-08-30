@@ -60,16 +60,7 @@ export default async function ExplorePage() {
         {items.map((c) => (
           <div key={c.id} className="card group flex flex-col overflow-hidden">
             <div className="relative">
-              {c.image_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={c.image_url}
-                  alt={c.title_zh || c.title_en}
-                  className="h-[130px] w-full object-cover"
-                />
-              ) : (
-                <CoverArt type={c.type || "其他"} title={c.title_zh || c.title_en} height="h-[130px]" />
-              )}
+              <CoverArt type={c.type || "其他"} title={c.title_zh || c.title_en} height="h-[130px]" />
               <span className="absolute right-3 top-3 z-[1]">
                 <FavButton
                   itemId={c.id}
