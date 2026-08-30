@@ -2,6 +2,7 @@ import Link from "next/link";
 import { listCollection, favoriteIds } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import FavButton from "@/components/FavButton";
+import CoverArt from "@/components/CoverArt";
 
 export const dynamic = "force-dynamic";
 
@@ -57,12 +58,10 @@ export default async function ExplorePage() {
       {/* 卡片网格 */}
       <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {items.map((c) => (
-          <div key={c.id} className="card flex flex-col overflow-hidden">
-            <div className="relative flex h-[110px] items-center justify-center border-b border-[rgba(255,255,255,0.06)] bg-gradient-to-b from-[#111116] to-[#0d0d10]">
-              <span className="mono text-[11px] tracking-[4px] text-[#4a4a54]">
-                {String(c.type || "其他").toUpperCase()}
-              </span>
-              <span className="absolute right-3 top-3">
+          <div key={c.id} className="card group flex flex-col overflow-hidden">
+            <div className="relative">
+              <CoverArt type={c.type || "其他"} title={c.title_zh || c.title_en} height="h-[130px]" />
+              <span className="absolute right-3 top-3 z-[1]">
                 <FavButton
                   itemId={c.id}
                   itemType="collection"

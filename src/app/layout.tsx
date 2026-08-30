@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Noto_Serif_SC } from "next/font/google";
 import "./globals.css";
 import Nav from "@/components/Nav";
+import OnboardingOverlay from "@/components/OnboardingOverlay";
 
 const serifCn = Noto_Serif_SC({
   subsets: ["latin"],
@@ -25,6 +26,7 @@ export default function RootLayout({
     <html lang="zh-CN" className={`${serifCn.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <Nav />
+        <OnboardingOverlay />
         <main className="flex-1">{children}</main>
         <footer className="border-t border-[rgba(255,255,255,0.05)] py-10 text-center text-xs tracking-[2px] text-[#4a4a54]">
           MakerHub · 造物主社区 —— AI 造物 · 晒出来 · 买得到

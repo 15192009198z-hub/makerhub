@@ -2,6 +2,7 @@ import Link from "next/link";
 import ProjectCard from "@/components/ProjectCard";
 import HeroParticles from "@/components/HeroParticles";
 import CubeTower from "@/components/CubeTower";
+import CoverArt from "@/components/CoverArt";
 import Journey from "@/components/Journey";
 import { listProjects } from "@/lib/db";
 import { TOOLS, COLLECTION } from "@/lib/catalog";
@@ -33,14 +34,14 @@ export default async function Home() {
             晒出来，<span className="text-[#4c8dff]">买得到</span>
           </h1>
           <p className="mt-7 max-w-[560px] text-base leading-[1.9] text-[#8e8e98]">
-            从想法到实物，只差一次生成。发现工具、挑一个设计清单，作品回到这里展示、找料、交易。
+            全球 AI 硬件社区的作品集合——不用读英文、不用懂电路，就能发现、收藏、买到有意思的造物。
           </p>
           <div className="mt-11 flex gap-3.5">
-            <Link href="/studio" className="btn btn-primary !px-8 !py-3.5 !text-[15px]">
-              去生成我的第一个实物
+            <Link href="/explore" className="btn btn-primary !px-8 !py-3.5 !text-[15px]">
+              逛逛全球作品
             </Link>
-            <Link href="/designs" className="btn btn-outline !px-8 !py-3.5 !text-[15px]">
-              看看真实案例
+            <Link href="/market" className="btn btn-outline !px-8 !py-3.5 !text-[15px]">
+              去市场看看
             </Link>
           </div>
         </div>
@@ -50,36 +51,36 @@ export default async function Home() {
       {/* ===== 造物旅程 ===== */}
       <Journey />
 
-      {/* ===== 如何使用 ===== */}
+      {/* ===== 新手指南 ===== */}
       <section className="border-t border-[rgba(255,255,255,0.05)]">
         <div className="mx-auto max-w-[1120px] px-6 py-24 lg:px-12">
           <div className="text-center">
-            <div className="kicker">HOW IT WORKS</div>
+            <div className="kicker">GET STARTED</div>
             <h2 className="mt-3 text-3xl font-extrabold tracking-[2px] lg:text-4xl">
-              三步，从想法到实物
+              三分钟上手
             </h2>
           </div>
           <div className="mt-14 grid grid-cols-1 gap-4 md:grid-cols-3">
             {[
               {
                 n: "01",
-                t: "去生成",
-                d: "打开 AI 造物工作室，用一句话描述你的想法，AI 生成零件清单 + 接线 + 组装步骤。",
-                cta: "打开工作室",
-                href: "/studio",
+                t: "逛作品",
+                d: "全球 AI 硬件社区的作品集合，全部翻译成中文——开发板、机器人、键盘、无人机，看看造物主们都做了什么。",
+                cta: "开始逛",
+                href: "/explore",
               },
               {
                 n: "02",
-                t: "来发布",
-                d: "回到 MakerHub 发布作品，粘贴零件清单（BOM），自动生成淘宝 / 1688 / 拼多多找料链接。",
-                cta: "发布作品",
-                href: "/submit",
+                t: "收藏心动",
+                d: "看到喜欢的作品点个星标收藏，随时回来看；关注感兴趣的领域，好作品不会错过。",
+                cta: "去逛逛",
+                href: "/explore",
               },
               {
                 n: "03",
-                t: "做出它",
-                d: "按链接买料（平均几十块），照着组装说明做出来，晒实物、挂交易意向，闲鱼成交。",
-                cta: "逛逛市场",
+                t: "买到手",
+                d: "想要现成的？市场里有造物主做好的成品、设计图纸和教程——不用自己动手，也能拥有一个。",
+                cta: "逛市场",
                 href: "/market",
               },
             ].map((g) => (
@@ -161,11 +162,7 @@ export default async function Home() {
               rel="noopener noreferrer"
               className="card flex flex-col overflow-hidden"
             >
-              <div className="flex h-[96px] items-center justify-center border-b border-[rgba(255,255,255,0.06)]">
-                <span className="mono text-[11px] tracking-[4px] text-[#565660]">
-                  {c.type.toUpperCase()}
-                </span>
-              </div>
+              <CoverArt type={c.type} title={c.title} height="h-[110px]" />
               <div className="flex flex-1 flex-col p-5">
                 <div className="flex items-center justify-between text-[15px] font-semibold">
                   {c.title}

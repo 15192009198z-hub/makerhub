@@ -1,4 +1,5 @@
 import Link from "next/link";
+import CoverArt from "@/components/CoverArt";
 import { listProducts } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
@@ -39,17 +40,20 @@ export default async function MarketPage() {
         <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {products.map((p) => (
             <Link key={p.id} href={`/market/${p.id}`} className="card block overflow-hidden">
-              <div className="flex h-[150px] items-center justify-center border-b border-[rgba(255,255,255,0.06)] bg-gradient-to-b from-[#111116] to-[#0d0d10] text-[26px] text-[#565660]">
+              <div className="relative">
                 {p.image_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={p.image_url}
                     alt={p.title}
-                    className="h-full w-full object-cover"
+                    className="h-[140px] w-full object-cover"
                   />
                 ) : (
-                  <span className="mono text-[13px] tracking-[3px]">▣</span>
+                  <CoverArt type={p.type} title={p.title} height="h-[140px]" />
                 )}
+                <span className={`absolute left-3 top-3 rounded border px-2 py-0.5 text-[10.5px] ${TYPE_STYLE[p.type] || TYPE_STYLE.实物}`}>
+                  {p.type}
+                </span>
               </div>
               <div className="p-5">
                 <div className="flex items-center justify-between gap-2">

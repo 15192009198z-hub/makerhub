@@ -8,7 +8,6 @@ export default async function Nav() {
   const links = [
     { href: "/", label: "作品" },
     { href: "/explore", label: "集合" },
-    { href: "/studio", label: "造物" },
     { href: "/market", label: "市场" },
   ];
   return (
