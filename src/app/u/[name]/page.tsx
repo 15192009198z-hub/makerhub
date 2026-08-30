@@ -124,11 +124,9 @@ export default async function UserPage({
                   <div className="flex gap-2">
                     <a
                       href={`/api/xianyu?product=${p.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="btn btn-outline !px-3 !py-1.5 !text-xs"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        window.open(`/api/xianyu?product=${p.id}`, "_blank");
-                      }}
                     >
                       闲鱼文案
                     </a>
