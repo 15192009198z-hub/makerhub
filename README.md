@@ -1,78 +1,32 @@
-# 🔧 MakerHub · 造物主社区
+# MakerHub · 造物主社区
 
-**全球 AI 硬件作品的中文聚合社区 + 交易市场。**
+国外有人用 AI 做了好多好玩的硬件——机器人、无人机、机械键盘、开发板……
+但你想看的时候：**看不懂英文，链接还打不开。**
 
-Blueprint / Cirkit / Schematik 这类 AI 工具生成的硬件作品，散落在各个英文社区——看不懂英文、打不开外网、不知道怎么买。MakerHub 把这些作品**自动聚合、AI 翻译成中文**，让人逛、收藏、买到手。
+所以我做了这个网站：把这些作品搬回来、翻译成中文，让你随便逛。
 
-> 🌐 线上：https://makerhub-eight.vercel.app
+逛着逛着发现：有人想要现成的，有人想学怎么做——那就再加个市场，
+造物主把做好的东西挂上来，你直接买（闲鱼交易）。
 
-## 📸 预览
+> 线上：https://makerhub-eight.vercel.app
+> 代码：就是这个仓库
 
-| 首页 | 作品集合 |
-|---|---|
-| ![首页](docs/screenshots/home.png) | ![作品集合](docs/screenshots/explore.png) |
+## 网站能干嘛
 
-## ✨ 核心功能
+- **逛**：全球 AI 硬件作品集合，每天自动抓取 + AI 翻译成中文（/explore）
+- **收藏**：看到喜欢的点个星标，回头慢慢看
+- **买**：市场里有人卖成品、设计图、教程，闲鱼直达，不用自己动手
 
-- **作品集合**（/explore）——自动聚合全球 AI 硬件作品（Blueprint 社区等），AI 翻译中文简介、类型/难度标注、每日更新（Vercel Cron）
-- **收藏**（⭐）——看到喜欢的作品一键收藏，个人主页随时回看
-- **市场**（/market）——造物主上架成品/设计/教程，图片上传 + 闲鱼链接，买家一键跳转闲鱼成交
-- **作品社区**——发布作品、点赞、评论、找料链接（淘宝/1688/拼多多）
-- **新用户引导**——首次访问三步引导浮层
-- **管理后台**——站长数据统计（用户/作品/商品/意向单）
+## 随手记
 
-## 🛠️ 技术栈
+- 一个人 + AI 从零写的，前端后端数据库全是自己搭
+- 聚合内容是定时任务每天自动抓的，不是人工搬运
+- 技术栈：Next.js 16 + Turso（SQLite）+ Tailwind，想跑起来就 `pnpm install && pnpm dev`
 
-| 层 | 选型 |
-|---|---|
-| 框架 | Next.js 16 (App Router) + TypeScript + Tailwind CSS 4 |
-| 数据库 | Turso (libsql) —— 本地文件 SQLite ↔ 生产托管，同一套代码 |
-| AI 翻译 | DeepSeek（聚合内容批量翻译中文） |
-| 定时任务 | Vercel Cron（每日聚合） |
-| 动画 | 纯 CSS 3D（造物立方塔 27 方块组装/爆炸/旋转）+ Canvas 粒子 |
+## 部署（想自建的话）
 
-## 🚀 本地开发
+环境变量见 `.env.example`：Turso 数据库、DeepSeek key（翻译用）、管理员名单、Cron 密钥。推送 GitHub 后 Vercel 导入即可。
 
-```bash
-pnpm install
-pnpm dev        # http://localhost:3000
-```
-
-零配置启动：数据库默认文件 SQLite（自动创建 `makerhub.db`）。
-
-## ☁️ 部署
-
-1. 推送到 GitHub → [vercel.com](https://vercel.com) 导入
-2. 配置环境变量（见 [.env.example](.env.example)）：
-   - `TURSO_DATABASE_URL` / `TURSO_AUTH_TOKEN`（[Turso](https://turso.tech) 免费创建）
-   - `LLM_API_KEY`（[DeepSeek](https://platform.deepseek.com)，用于聚合翻译）
-   - `ADMIN_NAMES`（管理员用户名，逗号分隔）
-   - `CRON_SECRET`（Vercel Cron 调用同步 API 的密钥）
-3. 手动触发一次聚合：`GET /api/cron/sync`（带 `Authorization: Bearer $CRON_SECRET`）
-
-## 📁 结构
-
-```
-src/
-├── app/
-│   ├── api/           # 同步/收藏/商品/意向单/作品/管理
-│   ├── explore/       # 作品集合（聚合内容）
-│   ├── market/        # 市场交易
-│   ├── u/[name]/      # 个人主页（收藏/作品/商品/意向单）
-│   └── submit/        # 发布作品 / 上架商品
-├── components/        # 立方塔动画 / 旅程动画 / 卡片 / 收藏按钮…
-└── lib/
-    ├── aggregators/   # 内容聚合器（blueprint / reddit / 翻译）
-    ├── db.ts          # 数据层（libsql）
-    └── parts.ts       # 找料引擎（三渠道搜索链接）
-```
-
-## 🤝 参与
-
-- 逛作品、收藏、提 Issue
-- 造物主：上架你的作品/教程
-- 开发者：PR 改进代码
-
-## 📄 License
+## License
 
 MIT
