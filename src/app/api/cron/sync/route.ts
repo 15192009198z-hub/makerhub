@@ -24,16 +24,27 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const source = searchParams.get("source") || "all";
 
-    // 抓取
+    // 抓取（各源独立报错，不静默）
     let fresh: Awaited<ReturnType<typeof fetchBlueprintNew>> = [];
+    const status: Record<string, string> = {};
     if (source === "all" || source === "blueprint") {
-      fresh = fresh.concat(await fetchBlueprintNew());
+      try {
+        fresh = fresh.concat(await fetchBlueprintNew());
+        status.blueprint = "ok";
+      } catch (e) {
+        status.blueprint = "fail: " + String(e).slice(0, 100);
+      }
     }
     if (source === "all" || source === "reddit") {
-      fresh = fresh.concat(await fetchRedditNew());
+      try {
+        fresh = fresh.concat(await fetchRedditNew());
+        status.reddit = "ok";
+      } catch (e) {
+        status.reddit = "fail: " + String(e).slice(0, 100);
+      }
     }
     if (fresh.length === 0) {
-      return NextResponse.json({ added: 0, msg: "没有新内容" });
+      return NextResponse.json({ added: 0, msg: "没有新内容", status });
     }
 
     // 翻译
@@ -57,7 +68,7 @@ export async function GET(req: Request) {
       });
       added++;
     }
-    return NextResponse.json({ added, total: fresh.length });
+    return NextResponse.json({ added, total: fresh.length, status });
   } catch (e) {
     return NextResponse.json({ error: String(e) }, { status: 500 });
   }
