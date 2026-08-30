@@ -41,8 +41,12 @@ export default async function UserPage({
   if (isMe) {
     const favIds = await favoriteIds(user.id, "collection");
     if (favIds.length > 0) {
-      const all = await listCollection(200);
-      myFavs = all.filter((c) => favIds.includes(c.id));
+      try {
+        const all = await listCollection(200);
+        myFavs = all.filter((c) => favIds.includes(c.id));
+      } catch (e) {
+        console.error("fav load error:", e);
+      }
     }
   }
 
