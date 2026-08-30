@@ -111,7 +111,7 @@ export default async function Home() {
           <div>
             <div className="kicker">WORKS</div>
             <h2 className="mt-3 text-3xl font-extrabold tracking-[2px] lg:text-4xl">
-              社区精选作品
+              最新作品
             </h2>
           </div>
           <Link href="/" className="text-[13px] text-[#5e5e68] hover:text-[#4c8dff]">
