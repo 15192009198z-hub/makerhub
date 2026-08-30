@@ -234,10 +234,22 @@ function ProductForm() {
   const [desc, setDesc] = useState("");
   const [price, setPrice] = useState("");
   const [type, setType] = useState("实物");
-  const [imageUrl, setImageUrl] = useState("");
-  const [projectId, setProjectId] = useState("");
+  const [imageBase64, setImageBase64] = useState("");
+  const [xianyuUrl, setXianyuUrl] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [msg, setMsg] = useState("");
+
+  function onFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 1.5 * 1024 * 1024) {
+      setMsg("图片不能超过 1.5MB");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => setImageBase64(String(reader.result));
+    reader.readAsDataURL(file);
+  }
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -252,8 +264,9 @@ function ProductForm() {
           desc,
           price: Number(price) || 0,
           type,
-          imageUrl,
-          projectId: projectId ? Number(projectId) : null,
+          imageUrl: imageBase64,
+          projectId: null,
+          xianyuUrl,
         }),
       });
       const data = await res.json();
@@ -284,7 +297,7 @@ function ProductForm() {
         <textarea value={desc} onChange={(e) => setDesc(e.target.value)} required rows={4}
           placeholder="卖什么？成色/内容/包含什么？怎么交付？" className={inputCls} />
       </div>
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <div>
           <label className="mb-1.5 block text-sm font-medium text-[#c8c8ce]">
             价格（元）*
@@ -302,24 +315,37 @@ function ProductForm() {
             <option value="教程">教程</option>
           </select>
         </div>
-        <div>
-          <label className="mb-1.5 block text-sm font-medium text-[#c8c8ce]">
-            关联作品 ID（可选）
-          </label>
-          <input value={projectId} onChange={(e) => setProjectId(e.target.value)}
-            placeholder="作品详情页的数字" className={inputCls} />
-        </div>
+
       </div>
       <div>
         <label className="mb-1.5 block text-sm font-medium text-[#c8c8ce]">
-          商品图（图片 URL，可选）
+          商品图
         </label>
-        <input value={imageUrl} onChange={(e) => setImageUrl(e.target.value)}
-          placeholder="https://…" className={inputCls} />
+        <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[rgba(255,255,255,0.15)] bg-[#0d0d10] py-8 text-[#5e5e68] transition-colors hover:border-[rgba(76,141,255,0.5)] hover:text-[#7fa8ff]">
+          <input type="file" accept="image/*" onChange={onFile} className="hidden" />
+          {imageBase64 ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={imageBase64} alt="预览" className="max-h-40 rounded-lg" />
+          ) : (
+            <span className="text-[13px] tracking-[1px]">
+              📷 点击上传商品图片（1.5MB 内）
+            </span>
+          )}
+        </label>
+      </div>
+      <div>
+        <label className="mb-1.5 block text-sm font-medium text-[#c8c8ce]">
+          闲鱼链接（发布到闲鱼后粘贴，买家一键直达）
+        </label>
+        <input value={xianyuUrl} onChange={(e) => setXianyuUrl(e.target.value)}
+          placeholder="https://market.m.goofish.com/…" className={inputCls} />
+        <p className="mt-1.5 text-[12px] leading-[1.7] text-[#5e5e68]">
+          怎么发布到闲鱼：复制商品信息 → 去闲鱼 App 发布 → 把链接粘回来
+        </p>
       </div>
       <div className="rounded-xl border border-[rgba(255,255,255,0.08)] bg-[#0f0f12] p-4 text-[12.5px] leading-[1.8] text-[#8e8e98]">
-        💡 上架后，你的商品页会自动生成<Link href="/market" className="text-[#7fa8ff] underline">闲鱼文案</Link>，
-        一键复制去闲鱼发布；意向单成交后记得回这里更新状态。
+        💡 发布流程：填好商品信息 → 点"一键复制闲鱼文案"去闲鱼 App 发布 →
+        把闲鱼链接粘回来，买家就能直接跳转下单。
       </div>
       {msg && (
         <p className="text-sm text-[#e8c07e]">

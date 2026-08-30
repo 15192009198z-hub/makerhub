@@ -71,6 +71,16 @@ export default async function ProductDetail({
               <span className="text-xs text-[#6e6e78]">含全套文档 + 答疑</span>
             )}
           </div>
+          {product.xianyu_url && (
+            <a
+              href={product.xianyu_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-blue mt-4 !px-6"
+            >
+              去闲鱼购买 ↗
+            </a>
+          )}
           <p className="mt-5 whitespace-pre-wrap leading-[1.9] text-[#c8c8ce]">
             {product.desc}
           </p>

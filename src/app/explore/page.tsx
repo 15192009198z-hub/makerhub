@@ -35,7 +35,7 @@ export default async function ExplorePage() {
           <h1 className="mt-3 text-4xl font-black tracking-[2px]">作品集合</h1>
           <p className="mt-4 max-w-[640px] text-[15px] leading-[1.9] text-[#8e8e98]">
             全球 AI 硬件社区的真实作品，自动聚合、AI 翻译成中文——
-            不用翻墙、不用读英文，就能逛遍全球造物主的作品。
+            全球 AI 硬件社区的作品，AI 翻译成中文简介——看不懂英文也能逛。
           </p>
         </div>
         <span className="mono hidden text-[12px] text-[#5e5e68] sm:block">
@@ -111,9 +111,7 @@ export default async function ExplorePage() {
           <Link href="/market" className="btn btn-blue">
             去市场逛逛
           </Link>
-          <Link href="/studio" className="btn btn-outline">
-            自己试着生成
-          </Link>
+
         </div>
       </div>
     </div>

@@ -19,7 +19,7 @@ export async function POST(req: Request) {
     const user = await getCurrentUser();
     if (!user) return NextResponse.json({ error: "请先登录" }, { status: 401 });
     const body = await req.json();
-    const { title, desc, price, type, imageUrl, projectId } = body;
+    const { title, desc, price, type, imageUrl, projectId, xianyuUrl } = body;
     if (!title || !desc) {
       return NextResponse.json({ error: "标题和描述不能为空" }, { status: 400 });
     }
@@ -34,6 +34,7 @@ export async function POST(req: Request) {
       type,
       imageUrl: String(imageUrl || ""),
       projectId: projectId ? Number(projectId) : null,
+      xianyuUrl: String(xianyuUrl || ""),
     });
     return NextResponse.json({ id });
   } catch (e) {

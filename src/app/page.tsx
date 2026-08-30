@@ -1,11 +1,11 @@
 import Link from "next/link";
 import ProjectCard from "@/components/ProjectCard";
 import HeroParticles from "@/components/HeroParticles";
-import CubeTower from "@/components/CubeTower";
-import CoverArt from "@/components/CoverArt";
 import Journey from "@/components/Journey";
+import CubeTower from "@/components/CubeTower";
+
 import { listProjects } from "@/lib/db";
-import { TOOLS, COLLECTION } from "@/lib/catalog";
+
 
 export const dynamic = "force-dynamic";
 
@@ -102,86 +102,6 @@ export default async function Home() {
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* ===== 工具集合 ===== */}
-      <section className="mx-auto max-w-[1120px] px-6 py-24 lg:px-12">
-        <div className="mb-10">
-          <div className="kicker">TOOLS</div>
-          <h2 className="mt-3 text-3xl font-extrabold tracking-[2px] lg:text-4xl">
-            接入的 AI 造物工具
-          </h2>
-        </div>
-        <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
-          {TOOLS.map((t) => (
-            <a
-              key={t.name}
-              href={t.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="card block p-6"
-            >
-              <div className="mono text-[11px] text-[#4a4a54]">{t.index}</div>
-              <h3 className="mt-3 text-base font-semibold tracking-[1px]">
-                {t.name}
-              </h3>
-              <p className="mt-2 text-[12.5px] leading-[1.7] text-[#6e6e78]">
-                {t.desc}
-              </p>
-              <span className="mt-3.5 inline-block rounded border border-[rgba(76,141,255,0.25)] px-2.5 py-1 text-[11px] text-[#8fb6ff]">
-                {t.tag}
-              </span>
-            </a>
-          ))}
-        </div>
-      </section>
-
-      {/* ===== 精选作品 ===== */}
-      <section className="mx-auto max-w-[1120px] px-6 pb-24 lg:px-12">
-        <div className="mb-10 flex items-end justify-between">
-          <div>
-            <div className="kicker">FEATURED</div>
-            <h2 className="mt-3 text-3xl font-extrabold tracking-[2px] lg:text-4xl">
-              精选作品
-            </h2>
-            <p className="mt-3 text-[13px] text-[#6e6e78]">
-              来自全球 AI 硬件社区的真实作品，AI 翻译成中文
-            </p>
-          </div>
-          <Link href="/explore" className="text-[13px] text-[#5e5e68] hover:text-[#4c8dff]">
-            逛全部集合 →
-          </Link>
-        </div>
-        <div className="grid grid-cols-1 gap-3.5 md:grid-cols-3">
-          {COLLECTION.slice(0, 3).map((c) => (
-            <a
-              key={c.id}
-              href={c.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="card flex flex-col overflow-hidden"
-            >
-              <CoverArt type={c.type} title={c.title} height="h-[110px]" />
-              <div className="flex flex-1 flex-col p-5">
-                <div className="flex items-center justify-between text-[15px] font-semibold">
-                  {c.title}
-                  <span className="text-[13px] text-[#565660] transition-all hover:text-[#4c8dff]">
-                    →
-                  </span>
-                </div>
-                <p className="mt-2 line-clamp-2 text-[12.5px] leading-[1.7] text-[#77777f]">
-                  {c.zh}
-                </p>
-                <div className="mt-auto flex items-center justify-between pt-4 text-[11.5px] text-[#5e5e68]">
-                  <span className="mono rounded border border-[rgba(76,141,255,0.25)] px-2 py-0.5 text-[11px] not-italic text-[#8fb6ff]">
-                    {c.difficulty}
-                  </span>
-                  <span>查看原项目 ↗</span>
-                </div>
-              </div>
-            </a>
-          ))}
         </div>
       </section>
 

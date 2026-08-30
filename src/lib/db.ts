@@ -13,6 +13,7 @@ export interface ProductRow {
   type: string; // 实物 | 设计 | 教程
   image_url: string;
   project_id: number | null;
+  xianyu_url: string;
   status: string; // 在售 | 下架
   created_at: string;
   author_name: string;
@@ -139,6 +140,12 @@ export async function initDb(): Promise<void> {
       FOREIGN KEY (buyer_id) REFERENCES users(id)
     )
   `);
+  // 兼容旧表：新增列（已存在则忽略）
+  try {
+    await db.execute("ALTER TABLE products ADD COLUMN xianyu_url TEXT DEFAULT ''");
+  } catch {
+    // 列已存在
+  }
   initialized = true;
 }
 
@@ -335,6 +342,7 @@ function mapProduct(r: Record<string, unknown>): ProductRow {
     type: (r.type as string) || "实物",
     image_url: (r.image_url as string) || "",
     project_id: r.project_id ? Number(r.project_id) : null,
+    xianyu_url: (r.xianyu_url as string) || "",
     status: (r.status as string) || "在售",
     created_at: (r.created_at as string) || "",
     author_name: (r.author_name as string) || "匿名",
@@ -373,19 +381,21 @@ export async function createProduct(input: {
   type: string;
   imageUrl: string;
   projectId: number | null;
+  xianyuUrl: string;
 }): Promise<number> {
   await initDb();
   const res = await db.execute({
-    sql: `INSERT INTO products (user_id, title, desc, price, type, image_url, project_id)
-          VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id`,
+    sql: `INSERT INTO products (user_id, title, desc, price, type, image_url, project_id, xianyu_url)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING id`,
     args: [
       input.userId,
       input.title.trim().slice(0, 80),
       input.desc.trim().slice(0, 2000),
       Math.max(0, Math.round(input.price)),
       input.type,
-      input.imageUrl.trim().slice(0, 1000),
+      input.imageUrl.trim().slice(0, 3000000),
       input.projectId,
+      (input.xianyuUrl || "").trim().slice(0, 500),
     ],
   });
   return Number(res.rows[0].id);
