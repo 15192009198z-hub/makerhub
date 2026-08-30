@@ -21,6 +21,7 @@ export default async function UserPage({
 }: {
   params: Promise<{ name: string }>;
 }) {
+  try {
   const { name } = await params;
   const [user, me] = await Promise.all([
     getUserByName(decodeURIComponent(name)),
@@ -235,6 +236,16 @@ export default async function UserPage({
       )}
     </div>
   );
+  } catch (e) {
+    return (
+      <div className="mx-auto max-w-[960px] px-6 py-20">
+        <h1 className="text-2xl font-black">页面加载失败</h1>
+        <pre className="mt-4 whitespace-pre-wrap rounded-xl border border-rose-500/30 bg-[#0f0f12] p-5 text-[13px] text-rose-300">
+          {String(e)}
+        </pre>
+      </div>
+    );
+  }
 }
 
 function StatusToggle({ productId, status }: { productId: number; status: string }) {
